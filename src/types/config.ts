@@ -1,9 +1,9 @@
 type Config = {
-    host: string;
-    port: number;
-    user: string;
-    password: string;
-    db: string;
+  host: string
+  port: number
+  user: string
+  password: string
+  db: string
 }
 
-export default Config;
+export default Config
