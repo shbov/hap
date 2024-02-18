@@ -1,6 +1,6 @@
-const fs = require('fs');
-const dotenv = require('dotenv');
-dotenv.config();
+const fs = require('fs')
+const dotenv = require('dotenv')
+dotenv.config()
 
 module.exports = {
   development: {
@@ -11,4 +11,4 @@ module.exports = {
     port: process.env.DB_PORT,
     dialect: 'postgres'
   }
-};
+}
