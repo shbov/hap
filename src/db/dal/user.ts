@@ -8,6 +8,15 @@ export const getById = async (id: number): Promise<User | null> => {
   return await User.findByPk(id)
 }
 
+export const getByIdWithoutCredentials = async (id: number): Promise<User | null> => {
+  return await User.findOne({
+    where: { id: id },
+    attributes: {
+      exclude: ['password']
+    }
+  })
+}
+
 export const getByEmail = async (email: string): Promise<User | null> => {
   return await User.findOne({ where: { email } })
 }

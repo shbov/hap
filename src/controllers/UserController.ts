@@ -1,43 +1,23 @@
 import * as userDal from '../db/dal/user'
-import User, { UserInput, UserOutput } from '../db/models/User'
-import { hashPassword } from '../helpers/hashPassword'
+import { Request, Response } from 'express'
+import { validationResult } from 'express-validator'
 
 export class UserController {
-  public static async create(payload: UserInput): Promise<UserOutput> {
-    const userPayload = {
-      name: payload.name,
-      email: payload.email,
-      phone: payload.phone,
-      password: await hashPassword(payload.password)
-    } as UserInput
-
-    const emailExists = await userDal.getByEmail(userPayload.email)
-    if (emailExists) {
-      throw new Error('email already in use')
+  public static async getUserData(req: Request, res: Response): Promise<Response> {
+    const result = validationResult(req)
+    if (!result.isEmpty()) {
+      return res.send({ errors: result.array() })
     }
 
-    const phoneExists = await userDal.getByPhone(userPayload.phone)
-    if (phoneExists) {
-      throw new Error('phone already is use')
+    // @ts-ignore
+    const { id } = req.user
+    console.log(`[UserController::getUserData] id: ${id}`)
+    try {
+      const user = await userDal.getByIdWithoutCredentials(parseInt(id, 10))
+      return res.status(200).send(user)
+    } catch (e) {
+      console.error(`[UserController::getUserData] ${e}`)
+      return res.status(500).send({ message: 'internal server error' })
     }
-
-    return userDal.create(userPayload)
-  }
-
-  public static async getById(id: number): Promise<User | null> {
-    const user = await userDal.getById(id)
-    if (!user) {
-      throw new Error('user not found')
-    }
-
-    return user
-  }
-
-  public static getByEmail(email: string): Promise<User | null> {
-    return userDal.getByEmail(email)
-  }
-
-  public static getByPhone(phone: string): Promise<User | null> {
-    return userDal.getByPhone(phone)
   }
 }
