@@ -7,6 +7,8 @@ import routes from './src/routes'
 const app: Express = express()
 const port = process.env.PORT
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 app.use('/api/v1', routes)
 
 app.listen(port, () => {

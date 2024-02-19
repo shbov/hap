@@ -7,12 +7,10 @@ interface UserAttributes {
   email: string
   phone: string
   password: string
-  image: string
-  createdAt: Date
-  updatedAt: Date
+  image: string | null
 }
 
-export interface UserInput extends Optional<UserAttributes, 'id'> {}
+export interface UserInput extends Optional<UserAttributes, 'id' | 'image'> {}
 export interface UserOutput extends Required<UserAttributes> {}
 
 class User extends Model {
@@ -21,7 +19,7 @@ class User extends Model {
   public email!: string
   public phone!: string
   public password!: string
-  public image!: string
+  public image!: string | null
 
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
@@ -41,11 +39,13 @@ User.init(
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      unique: true
     },
     phone: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      unique: true
     },
     password: {
       type: DataTypes.STRING,
