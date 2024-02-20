@@ -1,4 +1,4 @@
-import { DataTypes, Model } from 'sequelize'
+import { DataTypes, Model, Optional } from 'sequelize'
 import sequelizeConnection from '../config'
 import User from './User'
 import { v4 as uuidv4 } from 'uuid'
@@ -8,6 +8,16 @@ const jwtDataOptions = {
   jwtExpiration: process.env.JWT_EXPIRATION || '',
   jwtRefreshExpiration: process.env.JWT_REFRESH_EXPIRATION || ''
 }
+
+interface AuthTokenAttributes {
+  id: number
+  user: number
+  token: string
+  expiryDate: Date
+}
+
+export interface AuthTokenInput extends Optional<AuthTokenAttributes, 'id'> {}
+export interface AuthTokenOutput extends Required<AuthTokenAttributes> {}
 
 class AuthToken extends Model {
   public id!: number

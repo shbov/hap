@@ -7,9 +7,10 @@ import * as userDal from '../db/dal/user'
 import * as authTokenDal from '../db/dal/authToken'
 
 import { validationResult } from 'express-validator'
+import { errorHelper } from '../helpers/errorHelper'
 
 const jwtDataOptions = {
-  secret: process.env.JWT_SECRET || '',
+  secret: process.env.JWT_SECRET ?? '',
   jwtExpiration: process.env.JWT_EXPIRATION,
   jwtRefreshExpiration: process.env.JWT_REFRESH_EXPIRATION
 }
@@ -32,19 +33,20 @@ export class AuthController {
 
       const emailExists = await userDal.getByEmail(userPayload.email)
       if (emailExists) {
-        throw new Error('email already in use')
+        console.log('[AuthController::signUp] email already is use')
+        return res.status(400).send({ errors: ['email already is use'] })
       }
 
       const phoneExists = await userDal.getByPhone(userPayload.phone)
       if (phoneExists) {
-        throw new Error('phone already is use')
+        console.log('[AuthController::signUp] phone already is use')
+        return res.status(400).send({ errors: ['phone already is use'] })
       }
 
       const user = await userDal.create(userPayload)
       return res.status(201).send(user)
     } catch (e) {
-      console.error(`[AuthController::signUp] ${e}`)
-      return res.status(500).send(`${e}`)
+      return errorHelper(e, 'AuthController::signUp', 500, res)
     }
   }
 
@@ -58,12 +60,14 @@ export class AuthController {
       const { phone, password } = req.body
       const user = await userDal.getByPhone(phone)
       if (!user) {
-        throw new Error('user not found')
+        console.log('[AuthController::signIn] user not found')
+        return res.status(400).send({ errors: ['user not found'] })
       }
 
       const passwordMatch = await comparePassword(password, user.password)
       if (!passwordMatch) {
-        throw new Error('invalid password')
+        console.log('[AuthController::signIn] password not match')
+        return res.status(400).send({ errors: ['password not match'] })
       }
 
       const token = jwt.sign({ id: user.id }, jwtDataOptions.secret, {
@@ -79,8 +83,7 @@ export class AuthController {
         refreshToken
       })
     } catch (e) {
-      console.error(`[AuthController::signIn] ${e}`)
-      return res.status(500).send(`${e}`)
+      return errorHelper(e, 'AuthController::signIn', 500, res)
     }
   }
 
@@ -121,9 +124,8 @@ export class AuthController {
         accessToken: newAccessToken,
         refreshToken: refreshToken.token
       })
-    } catch (err) {
-      console.log('[AuthController::refreshToken]', err)
-      return res.status(500).send(`${err}`)
+    } catch (e) {
+      return errorHelper(e, 'AuthController::refreshToken', 500, res)
     }
   }
 }
