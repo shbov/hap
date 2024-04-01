@@ -1,8 +1,9 @@
 import dotenv from 'dotenv'
-dotenv.config()
-
 import { Sequelize } from 'sequelize'
-import Config from '../types/config'
+
+import Config from '../types/Config'
+
+dotenv.config()
 
 const config: Config = {
   host: process.env.DB_HOST as string,

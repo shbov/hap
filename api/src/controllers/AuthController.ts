@@ -1,13 +1,11 @@
 import { Request, Response } from 'express'
-import AuthToken from '../db/models/AuthToken'
-import { UserInput } from '../db/models/User'
-import jwt from 'jsonwebtoken'
-import { comparePassword, hashPassword } from '../helpers/hashPassword'
-import * as userDal from '../db/dal/user'
-import * as authTokenDal from '../db/dal/authToken'
-
 import { validationResult } from 'express-validator'
+import jwt from 'jsonwebtoken'
+
+import * as userDal from '../db/dal/user'
+import { UserInput } from '../db/models/User'
 import { errorHelper } from '../helpers/errorHelper'
+import { comparePassword, hashPassword } from '../helpers/hashPassword'
 
 const jwtDataOptions = {
   secret: process.env.JWT_SECRET ?? '',
@@ -19,7 +17,7 @@ export class AuthController {
   public static async signUp(req: Request, res: Response) {
     const result = validationResult(req)
     if (!result.isEmpty()) {
-      return res.send({ errors: result.array() })
+      return res.status(400).send({ errors: result.array() })
     }
 
     try {
@@ -53,7 +51,7 @@ export class AuthController {
   public static async signIn(req: Request, res: Response) {
     const result = validationResult(req)
     if (!result.isEmpty()) {
-      return res.send({ errors: result.array() })
+      return res.status(400).send({ errors: result.array() })
     }
 
     try {
@@ -61,71 +59,24 @@ export class AuthController {
       const user = await userDal.getByPhone(phone)
       if (!user) {
         console.log('[AuthController::signIn] user not found')
-        return res.status(400).send({ errors: ['user not found'] })
+        return res.status(400).send({ errors: ['Неверный номер телефона'] })
       }
 
       const passwordMatch = await comparePassword(password, user.password)
       if (!passwordMatch) {
         console.log('[AuthController::signIn] password not match')
-        return res.status(400).send({ errors: ['password not match'] })
+        return res.status(400).send({ errors: ['Неправильный пароль'] })
       }
 
-      const token = jwt.sign({ id: user.id }, jwtDataOptions.secret, {
+      const token = jwt.sign({ id: user.id, name: user.name, email: user.email }, jwtDataOptions.secret, {
         expiresIn: `${jwtDataOptions.jwtExpiration}s`
       })
 
-      const refreshToken = await AuthToken.createToken(user)
       return res.status(200).send({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        accessToken: token,
-        refreshToken
+        token
       })
     } catch (e) {
       return errorHelper(e, 'AuthController::signIn', 500, res)
-    }
-  }
-
-  public static async refreshToken(req: Request, res: Response): Promise<Response> {
-    const result = validationResult(req)
-    if (!result.isEmpty()) {
-      return res.send({ errors: result.array() })
-    }
-
-    const { refreshToken: requestToken } = req.body
-    if (requestToken == null) {
-      return res.status(403).send({ errors: ['Refresh Token is required!'] })
-    }
-
-    try {
-      const refreshToken = await authTokenDal.getByToken(requestToken)
-      if (!refreshToken) {
-        return res.status(403).send({ errors: ['Invalid refresh token'] })
-      }
-
-      if (AuthToken.verifyExpiration(refreshToken)) {
-        await AuthToken.destroy({ where: { id: refreshToken.id } })
-        return res.status(403).send({ errors: ['Refresh token expired'] })
-      }
-
-      const user = await userDal.getByIdWithoutCredentials(refreshToken.user)
-      if (!user) {
-        return res.status(403).send({
-          errors: ['User not found']
-        })
-      }
-
-      const newAccessToken = jwt.sign({ id: user.id }, jwtDataOptions.secret, {
-        expiresIn: `${jwtDataOptions.jwtExpiration}s`
-      })
-
-      return res.status(200).json({
-        accessToken: newAccessToken,
-        refreshToken: refreshToken.token
-      })
-    } catch (e) {
-      return errorHelper(e, 'AuthController::refreshToken', 500, res)
     }
   }
 }

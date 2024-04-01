@@ -1,7 +1,8 @@
 import { DataTypes, Model, Optional } from 'sequelize'
+
 import sequelizeConnection from '../config'
-import User from './User'
 import Event from './Event'
+import User from './User'
 
 interface EventInviteAttributes {
   id: number

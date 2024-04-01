@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken'
 import { NextFunction, Request, Response } from 'express'
+import jwt from 'jsonwebtoken'
 
 const jwtDataOptions = {
   secret: process.env.JWT_SECRET || '',
@@ -21,8 +21,12 @@ export const verifyTokenMiddleware = (req: Request, res: Response, next: NextFun
 
   try {
     console.log(`[verifyTokenMiddleware] token: ${token}, secret: ${jwtDataOptions.secret}`)
-    // @ts-ignore
-    req.user = jwt.verify(token, jwtDataOptions.secret)
+
+    const r = jwt.verify(token, jwtDataOptions.secret) as { id: string }
+    req.user = {
+      id: r.id
+    }
+
     next()
   } catch (err) {
     console.log(`[verifyTokenMiddleware] ${err}`)

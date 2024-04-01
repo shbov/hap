@@ -5,14 +5,16 @@
   "repository": "git@github.com:shbov/hap-api.git",
   "author": "Andrew Shubnikov <a.shbov@yandex.ru>",
   "license": "MIT",
+
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.1",
+    "@typescript-eslint/parser": "^7.0.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-simple-import-sort": "^12.0.0",
     "prettier": "^3.2.5",
-    "@typescript-eslint/eslint-plugin": "^7.0.1",
-    "@typescript-eslint/parser": "^7.0.1",
     "typescript": "^5.3.3"
   }
 }

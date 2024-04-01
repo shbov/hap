@@ -1,6 +1,7 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
+import { body } from 'express-validator'
+
 import { AuthController } from '../controllers/AuthController'
-import { body, validationResult } from 'express-validator'
 
 const authRouter = Router()
 
@@ -19,7 +20,5 @@ authRouter.post(
   body('password').notEmpty().isLength({ min: 8 }),
   AuthController.signUp
 )
-
-authRouter.post('/refresh-token', AuthController.refreshToken)
 
 export default authRouter

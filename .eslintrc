@@ -4,12 +4,18 @@
     "plugin:@typescript-eslint/recommended",
     "prettier"
   ],
-  "plugins": ["prettier"],
+  "plugins": [
+    "prettier",
+    "simple-import-sort"
+  ],
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
   "rules": {
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error"
   }
 }
+
