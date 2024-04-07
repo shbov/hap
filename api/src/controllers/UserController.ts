@@ -1,26 +1,25 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { validationResult } from 'express-validator'
 
 import * as userDal from '../db/dal/user'
-import { errorHelper } from '../helpers/errorHelper'
 
 export class UserController {
-  public static async getUserData(req: Request, res: Response): Promise<Response> {
+  public static async getUserData(req: Request, res: Response, next: NextFunction) {
     const result = validationResult(req)
     if (!result.isEmpty()) {
       return res.status(400).send({ errors: result.array() })
     }
+
     try {
-      const user = req.user
+      const user = req.userId
       if (!user) {
         return res.status(401).send({ message: 'Unauthorized!' })
       }
 
-      console.log(`[UserController::getUserData] id: ${user.id}`)
-      return res.status(200).send(await userDal.getByIdWithoutCredentials(user.id))
+      console.log(`[UserController::getUserData] id: ${user}`)
+      return res.status(200).send(await userDal.getByIdWithoutCredentials(user))
     } catch (e) {
-      console.error(`[UserController::getUserData] ${e}`)
-      return errorHelper(e, 'UserController::getUserData', 500, res)
+      return next(e)
     }
   }
 }

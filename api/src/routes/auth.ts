@@ -2,7 +2,8 @@ import { Router } from 'express'
 import { body } from 'express-validator'
 import multer from 'multer'
 
-import { AuthController } from '../controllers/AuthController'
+import AuthController from '../controllers/AuthController'
+import { generateAuthTokens } from '../middlewares/generateAuthTokens'
 
 const authRouter = Router()
 const storage = multer.diskStorage({
@@ -25,7 +26,15 @@ authRouter.post(
   '/sign-in',
   body('password').notEmpty(),
   body('phone').notEmpty().isMobilePhone('any'),
-  AuthController.signIn
+  AuthController.signIn,
+  generateAuthTokens
+)
+
+authRouter.post(
+  '/logout',
+  body('password').notEmpty(),
+  body('phone').notEmpty().isMobilePhone('any'),
+  AuthController.logout
 )
 
 authRouter.post(
@@ -34,7 +43,10 @@ authRouter.post(
   body('name').notEmpty().escape(),
   body('phone').notEmpty().isMobilePhone('any'),
   body('password').notEmpty().isLength({ min: 8 }),
-  AuthController.signUp
+  AuthController.signUp,
+  generateAuthTokens
 )
+
+authRouter.post('/refresh', AuthController.refreshAccessToken)
 
 export default authRouter

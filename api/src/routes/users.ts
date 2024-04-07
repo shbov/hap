@@ -1,10 +1,10 @@
 import { Router } from 'express'
 
 import { UserController } from '../controllers/UserController'
-import { verifyTokenMiddleware } from '../middlewares/verifyTokenMiddleware'
+import { isAuthenticated } from '../middlewares/isAuthenticated'
 
 const usersRouter = Router()
 
-usersRouter.get('/profile', verifyTokenMiddleware, UserController.getUserData)
+usersRouter.get('/profile', isAuthenticated, UserController.getUserData)
 
 export default usersRouter

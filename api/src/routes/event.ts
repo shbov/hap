@@ -1,11 +1,10 @@
 import { Router } from 'express'
-import { body } from 'express-validator'
 
 import { EventController } from '../controllers/EventController'
-import { verifyTokenMiddleware } from '../middlewares/verifyTokenMiddleware'
+import { isAuthenticated } from '../middlewares/isAuthenticated'
 
 const eventRouter = Router()
 
-eventRouter.get('/', verifyTokenMiddleware, EventController.getUserEvents)
+eventRouter.get('/', isAuthenticated, EventController.getUserEvents)
 
 export default eventRouter
