@@ -5,7 +5,6 @@
   "repository": "git@github.com:shbov/hap-api.git",
   "author": "Andrew Shubnikov <a.shbov@yandex.ru>",
   "license": "MIT",
-
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",

@@ -5,7 +5,7 @@ declare global {
   namespace Express {
     export interface Request extends Express.Request {
       user?: {
-        id: string
+        id: number
       }
     }
   }

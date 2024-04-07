@@ -8,10 +8,10 @@ import User from './User'
 interface EventAttributes {
   id: number
   name: string
-  description: string
+  description: string | null
   owner_id: number
   image: string | null
-  chosen_interval: string
+  chosen_interval: number | null
 }
 
 export interface EventInput extends Optional<EventAttributes, 'id' | 'image' | 'chosen_interval' | 'description'> {}
@@ -26,9 +26,25 @@ class Event extends Model {
   public image!: string | null
   public chosen_interval!: number | null
 
-  public readonly createdAt!: Date
-  public readonly updatedAt!: Date
-  public readonly deletedAt!: Date
+  public readonly created_at!: Date
+  public readonly updated_at!: Date
+  public readonly deleted_at!: Date
+
+  async getInvites() {
+    return await EventInvite.findAll({ where: { event_id: this.id } })
+  }
+
+  async getOwner() {
+    return await User.findByPk(this.owner_id)
+  }
+
+  async getInterval() {
+    if (!this.chosen_interval) {
+      return null
+    }
+
+    return await Interval.findByPk(this.chosen_interval)
+  }
 }
 
 Event.init(
@@ -74,9 +90,9 @@ Event.init(
   }
 )
 
-Event.belongsTo(User, { foreignKey: 'owner_id', as: 'owner' })
-Event.belongsTo(Interval, { foreignKey: 'chosen_interval', as: 'interval' })
+Event.hasMany(EventInvite, { foreignKey: 'event_id' })
+Event.hasOne(Interval, { foreignKey: 'id' })
 
-Event.hasMany(EventInvite, { foreignKey: 'event_id', as: 'invites' })
+Interval.belongsTo(Event, { foreignKey: 'id' })
 
 export default Event

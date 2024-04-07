@@ -21,28 +21,27 @@ export class AuthController {
     }
 
     try {
-      const { name, email, phone, password } = req.body
+      const { name, phone, password } = req.body
       const userPayload = {
         name,
-        email,
         phone,
-        password: await hashPassword(password)
+        password: await hashPassword(password),
+        image: req.file?.filename
       } as UserInput
-
-      const emailExists = await userDal.getByEmail(userPayload.email)
-      if (emailExists) {
-        console.log('[AuthController::signUp] email already is use')
-        return res.status(400).send({ errors: ['email already is use'] })
-      }
-
       const phoneExists = await userDal.getByPhone(userPayload.phone)
       if (phoneExists) {
         console.log('[AuthController::signUp] phone already is use')
-        return res.status(400).send({ errors: ['phone already is use'] })
+        return res.status(400).send({ errors: ['Такой номер телефона уже занят'] })
       }
 
       const user = await userDal.create(userPayload)
-      return res.status(201).send(user)
+      const token = jwt.sign({ id: user.id, name: user.name, image: user.image }, jwtDataOptions.secret, {
+        expiresIn: `${jwtDataOptions.jwtExpiration}s`
+      })
+
+      return res.status(201).send({
+        token
+      })
     } catch (e) {
       return errorHelper(e, 'AuthController::signUp', 500, res)
     }
@@ -68,7 +67,7 @@ export class AuthController {
         return res.status(400).send({ errors: ['Неправильный пароль'] })
       }
 
-      const token = jwt.sign({ id: user.id, name: user.name, email: user.email }, jwtDataOptions.secret, {
+      const token = jwt.sign({ id: user.id, name: user.name, image: user.image }, jwtDataOptions.secret, {
         expiresIn: `${jwtDataOptions.jwtExpiration}s`
       })
 

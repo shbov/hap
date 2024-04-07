@@ -67,3 +67,8 @@ yarn-error.log
 .env
 
 /ios/Carthage
+
+# Expo
+.expo
+dist/
+web-build/

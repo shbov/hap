@@ -1,8 +1,6 @@
 import { DataTypes, Model, Optional } from 'sequelize'
 
 import sequelizeConnection from '../config'
-import Event from './Event'
-import User from './User'
 
 interface IntervalAttributes {
   id: number
@@ -50,11 +48,9 @@ Interval.init(
   },
   {
     sequelize: sequelizeConnection,
-    tableName: 'intervals'
+    tableName: 'intervals',
+    timestamps: false
   }
 )
-
-Interval.belongsTo(User, { foreignKey: 'user_id', as: 'user' })
-Interval.belongsTo(Event, { foreignKey: 'event_id', as: 'event' })
 
 export default Interval

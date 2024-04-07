@@ -4,10 +4,10 @@ import {StyleSheet} from 'react-native';
 import {Pagination} from 'react-native-snap-carousel';
 
 import {Colors} from '../../styles/Style';
-import {Item} from '../../types/Item';
+import {CarouselItem} from '../../types/CarouselItem.ts';
 
 type Props = {
-  data: Item[];
+  data: CarouselItem[];
   activeSlide: number;
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
+import {decode, encode} from 'base-64';
 
 import {RootNavigator} from './src/navigation/RootNavigator.tsx';
 import ContextProvider from './src/store/contexts';
@@ -16,7 +16,15 @@ const MyTheme = {
   },
 };
 
-AsyncStorage.clear();
+if (!global.btoa) {
+  global.btoa = encode;
+}
+
+if (!global.atob) {
+  global.atob = decode;
+}
+
+// AsyncStorage.clear();
 
 const App = () => (
   <NavigationContainer theme={MyTheme}>

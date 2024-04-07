@@ -39,6 +39,8 @@ const PrimaryButton = ({
       backgroundColor: getColor(),
 
       ...styles,
+
+      opacity: disabled ? 0.5 : 1,
     },
 
     text: {

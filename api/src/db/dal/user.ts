@@ -1,3 +1,4 @@
+import Event from '../models/Event'
 import User, { UserInput, UserOutput } from '../models/User'
 
 export const create = async (payload: UserInput): Promise<UserOutput> => {
@@ -8,6 +9,15 @@ export const getById = async (id: number): Promise<User | null> => {
   return await User.findByPk(id)
 }
 
+export const getUserEvents = async (id: number): Promise<Event[] | null> => {
+  const user = await User.findByPk(id)
+  if (!user) {
+    return null
+  }
+
+  return await user.getEvents()
+}
+
 export const getByIdWithoutCredentials = async (id: number): Promise<User | null> => {
   return await User.findOne({
     where: { id: id },
@@ -15,10 +25,6 @@ export const getByIdWithoutCredentials = async (id: number): Promise<User | null
       exclude: ['password']
     }
   })
-}
-
-export const getByEmail = async (email: string): Promise<User | null> => {
-  return await User.findOne({ where: { email } })
 }
 
 export const getByPhone = async (phone: string): Promise<User | null> => {

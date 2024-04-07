@@ -1,12 +1,14 @@
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {Alert, StyleSheet, Text} from 'react-native';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   getFocusedRouteNameFromRoute,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {ImagePickerAsset} from 'expo-image-picker';
 
 import Step1 from './Step1.tsx';
 import Step2 from './Step2.tsx';
@@ -14,6 +16,8 @@ import Step3 from './Step3.tsx';
 import Step4 from './Step4.tsx';
 import GoBackButton from '../../../components/Buttons/GoBackButton.tsx';
 import {headerSettings} from '../../../navigation/RootNavigator.tsx';
+import {registerUserService} from '../../../services/authentication/authentication.services.ts';
+import {Type, UserContext} from '../../../store/contexts/user.context.ts';
 import {Colors, Style} from '../../../styles/Style.tsx';
 
 export enum Steps {
@@ -21,34 +25,35 @@ export enum Steps {
   PASSWORD = 'RPassword',
   NAME = 'RName',
   PHOTO = 'RPhoto',
+  FINAL = 'RFinal',
 }
 
-interface Form {
+export interface Form {
   phone: string;
   password: string;
   name: string;
-  photo?: any;
+  photo?: ImagePickerAsset;
 }
 
 const Register = () => {
   const Stack = createNativeStackNavigator();
   const navigation = useNavigation();
   const route = useRoute();
+  const {dispatchUser} = useContext(UserContext);
 
   const [step, setStep] = useState<Steps>(Steps.PHONE);
   const [form, setForm] = useState<Form>({} as Form);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     try {
-      navigation.navigate(step);
+      if (step !== Steps.FINAL) {
+        navigation.navigate(step as never);
+      }
     } catch (e) {
       console.log(e);
     }
   }, [navigation, step]);
-
-  useEffect(() => {
-    console.log(form);
-  }, [form.password, form.phone, form.name, form.photo, form]);
 
   const getKey = (newStep: Steps) => {
     if (newStep === Steps.PASSWORD) {
@@ -63,16 +68,90 @@ const Register = () => {
       return 'name';
     }
 
-    return 'photo';
+    if (newStep === Steps.FINAL) {
+      return 'photo';
+    }
+
+    return '';
   };
 
-  const onSubmit = (newStep: Steps, value: string) => {
+  const onSubmit = async (
+    newStep: Steps,
+    value: string | undefined | ImagePickerAsset,
+  ) => {
     setForm({
       ...form,
       [getKey(newStep)]: value,
     });
 
     setStep(newStep);
+
+    if (newStep === Steps.FINAL) {
+      setSubmitting(true);
+      await registerUserService(form)
+        .then(async responseData => {
+          if (responseData.status !== 201) {
+            setSubmitting(false);
+            return Alert.alert('Ошибка при регистрации', responseData.message, [
+              {text: 'ОК'},
+            ]);
+          }
+
+          const {data} = responseData;
+          if (data.token) {
+            await AsyncStorage.setItem('token', data.token);
+
+            dispatchUser({
+              type: Type.LOGGED_IN_SUCCESSFUL,
+              value: {
+                id: data.id,
+                name: data.name,
+                email: data.email,
+                phone: data.phone,
+                token: data.token,
+
+                isLoading: false,
+                isAuthenticated: true,
+              },
+            });
+
+            setSubmitting(false);
+          } else {
+            dispatchUser({
+              type: Type.LOGIN_FAILED,
+              value: {
+                isLoading: true,
+                isAuthenticated: false,
+                id: '',
+                name: '',
+                email: '',
+                phone: '',
+                token: '',
+              },
+            });
+          }
+        })
+        .catch(err => {
+          setSubmitting(false);
+          console.log(err);
+          dispatchUser({
+            type: Type.LOGIN_FAILED,
+            value: {
+              isLoading: true,
+              isAuthenticated: false,
+              id: '',
+              name: '',
+              email: '',
+              phone: '',
+              token: '',
+            },
+          });
+        });
+    }
+  };
+
+  const onUpload = (photo: ImagePickerAsset | undefined) => {
+    setForm({...form, photo});
   };
 
   const routeName = getFocusedRouteNameFromRoute(route);
@@ -127,7 +206,14 @@ const Register = () => {
 
       <Stack.Screen
         name={Steps.PHOTO}
-        children={() => <Step4 onSubmit={onSubmit} value={form.phone} />}
+        children={() => (
+          <Step4
+            onSubmit={onSubmit}
+            value={form.photo}
+            onUpload={onUpload}
+            submitting={submitting}
+          />
+        )}
         options={{
           ...headerSettings,
 

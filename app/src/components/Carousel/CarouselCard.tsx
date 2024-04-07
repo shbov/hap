@@ -2,11 +2,11 @@ import React from 'react';
 import {Dimensions, StyleSheet, Text, View} from 'react-native';
 
 import {Colors, Style, StyleConstant} from '../../styles/Style';
-import {Item} from '../../types/Item';
+import {CarouselItem} from '../../types/CarouselItem.ts';
 import CustomImage from '../Custom/CustomImage';
 
 type Props = {
-  item: Item;
+  item: CarouselItem;
 };
 
 const CarouselCard = ({item}: Props) => {

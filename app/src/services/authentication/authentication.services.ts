@@ -1,4 +1,7 @@
+// eslint-disable-next-line import/no-unresolved
 import {API_URL} from '@env';
+
+import {Form} from '../../pages/Auth/Register/Register.tsx';
 
 export interface UserData {
   phone: string;
@@ -16,7 +19,52 @@ interface ErrorInput {
   errors: Error[];
 }
 
-const getAlertMessage = ({errors}: ErrorInput) => {
+const createFormData = (state: Form) => {
+  const data = new FormData();
+  const {phone, password, name, photo} = state;
+
+  data.append('phone', phone);
+  data.append('password', password);
+  data.append('name', name);
+  if (photo) {
+    let uriParts = photo.uri.split('.');
+    let fileType = uriParts[uriParts.length - 1];
+
+    data.append('image', {
+      uri: photo.uri,
+      name: `photo.${fileType}`,
+      type: `image/${fileType}`,
+    });
+  }
+
+  return data;
+};
+
+const getRegisterAlertMessage = ({errors}: ErrorInput) => {
+  const isPhone = errors?.find(item => item.path === 'phone');
+  if (isPhone) {
+    return 'Такой номер телефона уже существует';
+  }
+
+  const isPassword = errors.find(item => item.path === 'password');
+  if (isPassword) {
+    return 'Слишком короткий пароль';
+  }
+
+  const isName = errors.find(item => item.path === 'name');
+  if (isName) {
+    return 'Некорректное имя';
+  }
+
+  const isPhoto = errors.find(item => item.path === 'image');
+  if (isPhoto) {
+    return 'Некорректное фото';
+  }
+
+  return errors.length > 0 ? errors.join(';') : 'Ошибка';
+};
+
+const getLoginAlertMessage = ({errors}: ErrorInput) => {
   const isPhone = errors?.find(item => item.path === 'phone');
   if (isPhone) {
     return 'Неправильный номер телефона';
@@ -44,16 +92,15 @@ export const loginUserService = async (userData: UserData) => {
     const responseJson = await response.json();
     console.log('response object:', responseJson);
 
-    if (response.status !== 200) {
+    if (response.status !== 201) {
       return {
         status: response.status,
-        message: getAlertMessage(responseJson),
+        message: getLoginAlertMessage(responseJson),
       };
     }
 
-    return {status: 200, data: responseJson};
+    return {status: response.status, data: responseJson};
   } catch (error) {
-    console.log('Request failed, Please try again!');
     return {
       status: 500,
       message: 'Request failed, Please try again!',
@@ -61,21 +108,34 @@ export const loginUserService = async (userData: UserData) => {
   }
 };
 
-export const registerUserService = async (userData: UserData) => {
+export const registerUserService = async (userData: Form) => {
   try {
+    const body = createFormData(userData);
     const response = await fetch(API_URL + '/api/v1/auth/sign-up', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data',
       },
-      body: JSON.stringify(userData),
+      body,
     });
 
-    return await response.json();
+    const responseData = await response.json();
+    if (response.status !== 201) {
+      return {
+        status: response.status,
+        message: getRegisterAlertMessage(responseData),
+      };
+    }
+
+    return {
+      status: response.status,
+      data: responseData,
+    };
   } catch (error) {
-    console.log(error);
-    console.log('Request failed, Please try again!');
-    return {message: 'Request failed, Please try again!'};
+    return {
+      status: 500,
+      message: 'Request failed, Please try again!',
+    };
   }
 };

@@ -6,10 +6,10 @@ import Carousel from 'react-native-snap-carousel';
 import CarouselCard from './CarouselCard';
 import {CustomPagination} from './CustomPagination.tsx';
 import {Style} from '../../styles/Style';
-import {Item} from '../../types/Item';
+import {CarouselItem} from '../../types/CarouselItem.ts';
 
 type PropsType = {
-  items: Item[];
+  items: CarouselItem[];
 };
 
 const CarouselCards = ({items}: PropsType) => {

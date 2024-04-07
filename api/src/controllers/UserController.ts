@@ -17,7 +17,7 @@ export class UserController {
       }
 
       console.log(`[UserController::getUserData] id: ${user.id}`)
-      return res.status(200).send(await userDal.getByIdWithoutCredentials(parseInt(user.id, 10)))
+      return res.status(200).send(await userDal.getByIdWithoutCredentials(user.id))
     } catch (e) {
       console.error(`[UserController::getUserData] ${e}`)
       return errorHelper(e, 'UserController::getUserData', 500, res)

@@ -13,6 +13,7 @@ export const verifyTokenMiddleware = (req: Request, res: Response, next: NextFun
     return res.status(403).send({ message: 'No token provided!' })
   }
 
+  console.log(`[verifyTokenMiddleware] token: ${token}`)
   if (token.startsWith('Bearer ')) {
     token = token.substring(7, token.length)
   } else {
@@ -22,9 +23,9 @@ export const verifyTokenMiddleware = (req: Request, res: Response, next: NextFun
   try {
     console.log(`[verifyTokenMiddleware] token: ${token}, secret: ${jwtDataOptions.secret}`)
 
-    const r = jwt.verify(token, jwtDataOptions.secret) as { id: string }
+    const r = jwt.verify(token, jwtDataOptions.secret) as { id: number }
     req.user = {
-      id: r.id
+      id: Number(r.id)
     }
 
     next()

@@ -7,13 +7,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import PrimaryButton from '../components/Buttons/PrimaryButton';
 import CarouselCards from '../components/Carousel/CarouselCards';
 import {Colors, Style} from '../styles/Style.tsx';
-import {Item} from '../types/Item.ts';
+import {CarouselItem} from '../types/CarouselItem.ts';
 
 export interface OnboardingProps {
   onPress: () => void;
 }
 
-const items: Item[] = [
+const items: CarouselItem[] = [
   {
     title: 'Наполняй свою жизнь встречами с важными тебе людьми',
     src: require('../../assets/images/onboarding-1.png'),
