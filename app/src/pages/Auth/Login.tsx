@@ -10,7 +10,6 @@ import Form, {State} from './Form.tsx';
 import {phoneFormat} from '../../functions/phoneFormat.ts';
 import {loginUserService} from '../../services/authentication/authentication.services.ts';
 import {Type, UserContext} from '../../store/contexts/user.context.ts';
-import {STATUS} from '../../store/reducers/user.reducer.ts';
 import {Colors} from '../../styles/Style.tsx';
 
 export const Login = () => {

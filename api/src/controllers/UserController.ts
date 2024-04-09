@@ -28,4 +28,21 @@ export class UserController {
       return next(e)
     }
   }
+
+  public static getNotifications = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = req.userId
+      if (!user) {
+        return res.status(401).send({ message: 'Unauthorized!' })
+      }
+
+      console.log(`[UserController::getNotifications] id: ${user}`)
+
+      return res.status(200).send({
+        notifications: await userDal.getNotifications(user)
+      })
+    } catch (e) {
+      return next(e)
+    }
+  }
 }

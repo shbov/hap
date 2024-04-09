@@ -1,8 +1,6 @@
 import React from 'react';
 import {SafeAreaView, ScrollView, StyleSheet, Text} from 'react-native';
 
-import {ScreenStackProps} from 'react-native-screens';
-
 import {Style} from '../../styles/Style.tsx';
 
 interface ScreenProps {

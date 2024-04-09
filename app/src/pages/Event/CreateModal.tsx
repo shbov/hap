@@ -1,8 +1,8 @@
 import React from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 
 import PrimaryButton from '../../components/Buttons/PrimaryButton.tsx';
-import {Colors, Style} from '../../styles/Style.tsx';
+import {Style} from '../../styles/Style.tsx';
 
 const CreateModal = () => {
   return (

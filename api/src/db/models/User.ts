@@ -4,6 +4,7 @@ import sequelizeConnection from '../config'
 import Event from './Event'
 import EventUser from './EventUser'
 import Interval from './Interval'
+import Notification from './Notification'
 
 interface UserAttributes {
   id: number
@@ -14,6 +15,7 @@ interface UserAttributes {
 }
 
 export interface UserInput extends Optional<UserAttributes, 'id' | 'image'> {}
+
 export interface UserOutput extends Required<UserAttributes> {}
 
 class User extends Model {
@@ -37,6 +39,17 @@ class User extends Model {
         {
           model: Interval,
           attributes: ['id', 'started_at', 'finished_at']
+        }
+      ]
+    })
+  }
+
+  async getNotifications() {
+    return await User.findByPk(this.id, {
+      include: [
+        {
+          model: Notification,
+          as: 'notifications'
         }
       ]
     })
@@ -102,6 +115,16 @@ User.belongsToMany(User, {
   as: 'friends',
   foreignKey: 'user_id',
   otherKey: 'friend_id'
+})
+
+User.hasMany(Notification, {
+  foreignKey: 'userId',
+  as: 'notifications'
+})
+
+Notification.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user'
 })
 
 export default User

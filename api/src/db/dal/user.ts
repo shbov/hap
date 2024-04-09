@@ -18,7 +18,7 @@ export const getUserEvents = async (id: number): Promise<Event[] | null> => {
   return await user.getEvents()
 }
 
-export const getByIdWithoutCredentials = async (id: number): Promise<User | null> => {
+export const getByIdWithoutCredentials = async (id: number) => {
   return await User.findOne({
     where: { id: id },
     attributes: {
@@ -27,15 +27,24 @@ export const getByIdWithoutCredentials = async (id: number): Promise<User | null
   })
 }
 
-export const getByPhone = async (phone: string): Promise<User | null> => {
+export const getByPhone = async (phone: string) => {
   return await User.findOne({ where: { phone } })
 }
 
-export const getUserFriends = async (id: number): Promise<User[] | null> => {
+export const getUserFriends = async (id: number) => {
   const user = await User.findByPk(id)
   if (!user) {
     return null
   }
 
   return await user.getFriends()
+}
+
+export const getNotifications = async (id: number) => {
+  const user = await User.findByPk(id)
+  if (!user) {
+    return null
+  }
+
+  return await user.getNotifications()
 }
