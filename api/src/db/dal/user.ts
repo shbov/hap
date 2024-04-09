@@ -30,3 +30,12 @@ export const getByIdWithoutCredentials = async (id: number): Promise<User | null
 export const getByPhone = async (phone: string): Promise<User | null> => {
   return await User.findOne({ where: { phone } })
 }
+
+export const getUserFriends = async (id: number): Promise<User[] | null> => {
+  const user = await User.findByPk(id)
+  if (!user) {
+    return null
+  }
+
+  return await user.getFriends()
+}

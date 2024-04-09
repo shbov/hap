@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-unresolved
 import {API_URL} from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {Form} from '../../pages/Auth/Register/Register.tsx';
 
@@ -16,7 +17,7 @@ interface Error {
 }
 
 interface ErrorInput {
-  errors: Error[];
+  message: Error[] | string;
 }
 
 const createFormData = (state: Form) => {
@@ -40,48 +41,59 @@ const createFormData = (state: Form) => {
   return data;
 };
 
-const getRegisterAlertMessage = ({errors}: ErrorInput) => {
-  const isPhone = errors?.find(item => item.path === 'phone');
-  if (isPhone) {
-    return 'Такой номер телефона уже существует';
+const getRegisterAlertMessage = (props: ErrorInput): string => {
+  const errors = Array.isArray(props.message) ? props.message : null;
+  if (errors) {
+    const isPhone = errors?.find(item => item.path === 'phone');
+    if (isPhone) {
+      return 'Такой номер телефона уже существует';
+    }
+
+    const isPassword = errors.find(item => item.path === 'password');
+    if (isPassword) {
+      return 'Слишком короткий пароль';
+    }
+
+    const isName = errors.find(item => item.path === 'name');
+    if (isName) {
+      return 'Некорректное имя';
+    }
+
+    const isPhoto = errors.find(item => item.path === 'image');
+    if (isPhoto) {
+      return 'Некорректное фото';
+    }
+
+    return errors.length > 0 ? errors.join(';') : 'Ошибка';
   }
 
-  const isPassword = errors.find(item => item.path === 'password');
-  if (isPassword) {
-    return 'Слишком короткий пароль';
-  }
-
-  const isName = errors.find(item => item.path === 'name');
-  if (isName) {
-    return 'Некорректное имя';
-  }
-
-  const isPhoto = errors.find(item => item.path === 'image');
-  if (isPhoto) {
-    return 'Некорректное фото';
-  }
-
-  return errors.length > 0 ? errors.join(';') : 'Ошибка';
+  return props.message as string;
 };
 
-const getLoginAlertMessage = ({errors}: ErrorInput) => {
-  const isPhone = errors?.find(item => item.path === 'phone');
-  if (isPhone) {
-    return 'Неправильный номер телефона';
+const getLoginAlertMessage = (props: ErrorInput): string => {
+  const errors = Array.isArray(props.message) ? props.message : null;
+  if (errors) {
+    const isPhone = errors?.find(item => item.path === 'phone');
+    if (isPhone) {
+      return 'Неправильный номер телефона';
+    }
+
+    const isPassword = errors.find(item => item.path === 'password');
+    if (isPassword) {
+      return 'Неправильный пароль';
+    }
+
+    return errors.length > 0 ? errors.join(';') : 'Ошибка';
   }
 
-  const isPassword = errors.find(item => item.path === 'password');
-  if (isPassword) {
-    return 'Неправильный пароль';
-  }
-
-  return errors.length > 0 ? errors.join(';') : 'Ошибка';
+  return props.message as string;
 };
 
 export const loginUserService = async (userData: UserData) => {
   try {
     const response = await fetch(API_URL + '/api/v1/auth/sign-in', {
       method: 'POST',
+      credentials: 'include',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -92,7 +104,7 @@ export const loginUserService = async (userData: UserData) => {
     const responseJson = await response.json();
     console.log('response object:', responseJson);
 
-    if (response.status !== 201) {
+    if (response.status !== 200) {
       return {
         status: response.status,
         message: getLoginAlertMessage(responseJson),
@@ -113,6 +125,7 @@ export const registerUserService = async (userData: Form) => {
     const body = createFormData(userData);
     const response = await fetch(API_URL + '/api/v1/auth/sign-up', {
       method: 'POST',
+      credentials: 'include',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'multipart/form-data',
@@ -121,10 +134,50 @@ export const registerUserService = async (userData: Form) => {
     });
 
     const responseData = await response.json();
-    if (response.status !== 201) {
+    if (response.status !== 200) {
       return {
         status: response.status,
         message: getRegisterAlertMessage(responseData),
+      };
+    }
+
+    return {
+      status: response.status,
+      data: responseData,
+    };
+  } catch (error) {
+    return {
+      status: 500,
+      message: 'Request failed, Please try again!',
+    };
+  }
+};
+
+export const updateAccessToken = async () => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    if (!token) {
+      return {
+        status: 401,
+        message: 'Unauthorized',
+      };
+    }
+
+    const response = await fetch(API_URL + '/api/v1/auth/refresh', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const responseData = await response.json();
+    if (response.status !== 200) {
+      return {
+        status: response.status,
+        message: responseData.message,
       };
     }
 

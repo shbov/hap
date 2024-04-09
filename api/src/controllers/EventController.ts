@@ -19,7 +19,6 @@ export class EventController {
 
       console.log(`[EventController::getUserEvents] id: ${user}`)
       const events = await userDal.getUserEvents(user)
-
       return res.status(200).send({
         events: events
       })

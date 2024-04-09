@@ -10,10 +10,11 @@ import Form, {State} from './Form.tsx';
 import {phoneFormat} from '../../functions/phoneFormat.ts';
 import {loginUserService} from '../../services/authentication/authentication.services.ts';
 import {Type, UserContext} from '../../store/contexts/user.context.ts';
+import {STATUS} from '../../store/reducers/user.reducer.ts';
 import {Colors} from '../../styles/Style.tsx';
 
 export const Login = () => {
-  const {dispatchUser} = useContext(UserContext);
+  const {dispatch} = useContext(UserContext);
 
   const onSubmit = (
     values: FormikValues,
@@ -34,55 +35,36 @@ export const Login = () => {
           ]);
         }
 
-        const {data} = responseData;
-        if (data.token) {
+        const {token, user, expiresAt} = responseData.data;
+        if (token) {
           resetForm({});
-          await AsyncStorage.setItem('token', data.token);
+          await AsyncStorage.setItem('token', token);
 
-          dispatchUser({
+          dispatch({
             type: Type.LOGGED_IN_SUCCESSFUL,
-            value: {
-              id: data.id,
-              name: data.name,
-              email: data.email,
-              phone: data.phone,
-              token: data.token,
-
-              isLoading: false,
-              isAuthenticated: true,
+            payload: {
+              user: {
+                id: user.id,
+                name: user.name,
+                phone: user.phone,
+              },
+              token,
+              expiresAt: new Date(expiresAt),
             },
           });
 
           setSubmitting(false);
         } else {
-          dispatchUser({
+          dispatch({
             type: Type.LOGIN_FAILED,
-            value: {
-              isLoading: true,
-              isAuthenticated: false,
-              id: '',
-              name: '',
-              email: '',
-              phone: '',
-              token: '',
-            },
           });
         }
       })
       .catch(error => {
         console.error(error);
         setSubmitting(false);
-        dispatchUser({
+        dispatch({
           type: Type.LOGIN_FAILED,
-          value: {
-            isLoading: true,
-            isAuthenticated: false,
-            id: '',
-            name: '',
-            email: '',
-            phone: '',
-            token: '',
-          },
         });
       });
   };

@@ -39,7 +39,7 @@ const Register = () => {
   const Stack = createNativeStackNavigator();
   const navigation = useNavigation();
   const route = useRoute();
-  const {dispatchUser} = useContext(UserContext);
+  const {dispatch} = useContext(UserContext);
 
   const [step, setStep] = useState<Steps>(Steps.PHONE);
   const [form, setForm] = useState<Form>({} as Form);
@@ -90,7 +90,7 @@ const Register = () => {
       setSubmitting(true);
       await registerUserService(form)
         .then(async responseData => {
-          if (responseData.status !== 201) {
+          if (responseData.status !== 200) {
             setSubmitting(false);
             return Alert.alert('Ошибка при регистрации', responseData.message, [
               {text: 'ОК'},
@@ -101,50 +101,31 @@ const Register = () => {
           if (data.token) {
             await AsyncStorage.setItem('token', data.token);
 
-            dispatchUser({
+            dispatch({
               type: Type.LOGGED_IN_SUCCESSFUL,
-              value: {
-                id: data.id,
-                name: data.name,
-                email: data.email,
-                phone: data.phone,
+              payload: {
+                user: {
+                  id: data.user.id,
+                  name: data.user.name,
+                  phone: data.user.phone,
+                },
                 token: data.token,
-
-                isLoading: false,
-                isAuthenticated: true,
+                expiresAt: new Date(data.expiresAt),
               },
             });
 
             setSubmitting(false);
           } else {
-            dispatchUser({
+            dispatch({
               type: Type.LOGIN_FAILED,
-              value: {
-                isLoading: true,
-                isAuthenticated: false,
-                id: '',
-                name: '',
-                email: '',
-                phone: '',
-                token: '',
-              },
             });
           }
         })
         .catch(err => {
           setSubmitting(false);
           console.log(err);
-          dispatchUser({
+          dispatch({
             type: Type.LOGIN_FAILED,
-            value: {
-              isLoading: true,
-              isAuthenticated: false,
-              id: '',
-              name: '',
-              email: '',
-              phone: '',
-              token: '',
-            },
           });
         });
     }

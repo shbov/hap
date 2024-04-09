@@ -14,15 +14,15 @@ export const getEvents = async (): Promise<Response> => {
     const token = await AsyncStorage.getItem('token');
     const response = await fetch(API_URL + '/api/v1/event', {
       method: 'GET',
+      credentials: 'include',
       headers: {
         Accept: 'application/json',
-        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
     });
 
     const responseData = await response.json();
-    console.log(responseData);
     if (response.status !== 200) {
       return {
         status: response.status,

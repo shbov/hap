@@ -39,7 +39,8 @@ const BottomNavigation = () => {
     <View style={styles.bottom}>
       <TouchableOpacity
         style={styles.icon}
-        activeOpacity={StyleConstant.hover.opacity}>
+        activeOpacity={StyleConstant.hover.opacity}
+        onPress={() => navigation.navigate('Home')}>
         <CustomImage
           source={require('../../../assets/images/list.png')}
           width={32}
@@ -56,7 +57,8 @@ const BottomNavigation = () => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.icon}
-        activeOpacity={StyleConstant.hover.opacity}>
+        activeOpacity={StyleConstant.hover.opacity}
+        onPress={() => navigation.navigate('Profile')}>
         <CustomImage
           source={require('../../../assets/images/profile.png')}
           width={32}

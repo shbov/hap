@@ -17,7 +17,13 @@ export class UserController {
       }
 
       console.log(`[UserController::getUserData] id: ${user}`)
-      return res.status(200).send(await userDal.getByIdWithoutCredentials(user))
+
+      const friends = await userDal.getUserFriends(user)
+      return res.status(200).send({
+        user: await userDal.getByIdWithoutCredentials(user),
+        events: (await userDal.getUserEvents(user))?.length ?? 0,
+        friends: friends?.length ?? 0
+      })
     } catch (e) {
       return next(e)
     }

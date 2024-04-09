@@ -1,6 +1,6 @@
 export interface Event {
   id: string;
-  title: string;
+  name: string;
   description?: string;
   fullwidth?: boolean;
   link?: string;

@@ -22,7 +22,6 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
     }
 
     const refreshTokenInDB = await refreshTokenDal.getRefreshToken(refreshToken)
-
     if (!refreshTokenInDB) {
       throw createError.Unauthorized()
     }
@@ -31,8 +30,9 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
     try {
       decodedToken = jwt.verify(accessToken, ACCESS_TOKEN_SECRET!) as { userId: number }
     } catch (err) {
-      const error = createError.Unauthorized()
-      return next(error)
+      console.log('accessToken', accessToken)
+      console.log('err', err)
+      return next(createError.Unauthorized())
     }
 
     const { userId } = decodedToken

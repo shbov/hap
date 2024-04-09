@@ -7,11 +7,12 @@ export const getUserProfileDataService = async () => {
 
   try {
     const response = await fetch(API_URL + '/api/v1/users/profile', {
-      method: 'POST',
+      method: 'GET',
+      credentials: 'include',
       headers: {
         Accept: 'application/json',
-        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
     });
 

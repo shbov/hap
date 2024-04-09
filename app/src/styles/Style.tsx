@@ -13,11 +13,12 @@ export const Colors = {
   blue: '#007AFF',
 
   white: '#fff',
-  background: '#FBF9F5',
+  background: '#F6F6F6',
   backgroundDark: '#040404',
 
   lightGrey: 'rgba(255, 255, 255, .5)',
   grey: '#AEAEB2',
+  darkGrey: '#4F4F4F',
 
   danger: '#F7867E',
   backgroundAccent: 'rgba(245, 235, 229, 1)',

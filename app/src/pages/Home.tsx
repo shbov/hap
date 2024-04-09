@@ -26,25 +26,38 @@ const Section = {
 };
 
 export const Gap = 16;
+const getUpcomingEvent = (events: Event[]) => {
+  return events.find(
+    e => new Date(e?.choosen_interval?.started_at) > new Date(),
+  );
+};
 
 const Home = ({navigation}: NativeStackScreenProps<any>) => {
   const [items, setItems] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [upcomingEvent, setUpcomingEvent] = useState<Event | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     setLoading(true);
     getEvents().then(r => {
-      setItems(r.events);
+      const events = r.events;
+      setUpcomingEvent(getUpcomingEvent(events));
+      setItems(events.filter(e => e.id !== upcomingEvent?.id));
       setLoading(false);
     });
   }, []);
 
-  const onPress = (id: Event['id']) => {
+  const onPress = (event: Event | undefined) => {
     return (e: GestureResponderEvent) => {
       e.preventDefault();
+      if (!event) {
+        return;
+      }
 
       navigation.navigate('ViewEvent', {
-        id,
+        event,
       });
     };
   };
@@ -66,17 +79,21 @@ const Home = ({navigation}: NativeStackScreenProps<any>) => {
           </TouchableOpacity>
         </View>
 
-        {/*<View style={styles.container}>*/}
-        {/*  <Text style={styles.header}>{Section.Upcoming}</Text>*/}
-        {/*</View>*/}
+        {upcomingEvent && (
+          <>
+            <View style={styles.container}>
+              <Text style={styles.header}>{Section.Upcoming}</Text>
+            </View>
 
-        {/*<View style={styles.grid}>*/}
-        {/*  <Item*/}
-        {/*    item={upcomingEvent}*/}
-        {/*    fullwidth*/}
-        {/*    onPress={onPress(upcomingEvent.id)}*/}
-        {/*  />*/}
-        {/*</View>*/}
+            <View style={styles.grid}>
+              <Item
+                item={upcomingEvent}
+                fullwidth
+                onPress={onPress(upcomingEvent)}
+              />
+            </View>
+          </>
+        )}
 
         <View style={styles.container}>
           <Text style={styles.header}>{Section.Past}</Text>
@@ -84,9 +101,7 @@ const Home = ({navigation}: NativeStackScreenProps<any>) => {
 
         <View style={styles.grid}>
           {items.map(item => {
-            return (
-              <Item item={item} key={item.id} onPress={onPress(item.id)} />
-            );
+            return <Item item={item} key={item.id} onPress={onPress(item)} />;
           })}
         </View>
       </ScrollView>

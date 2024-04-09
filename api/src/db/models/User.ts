@@ -41,6 +41,21 @@ class User extends Model {
       ]
     })
   }
+
+  async getFriends(): Promise<User[] | null> {
+    const user = await User.findByPk(this.id, {
+      include: [
+        {
+          model: User,
+          as: 'friends',
+          attributes: ['name', 'id', 'image']
+        }
+      ]
+    })
+
+    // @ts-ignore
+    return user.friends
+  }
 }
 
 User.init(
@@ -81,5 +96,12 @@ Event.belongsToMany(User, { through: EventUser, foreignKey: 'event_id' })
 
 User.hasMany(Event, { foreignKey: 'owner_id' })
 Event.belongsTo(User, { foreignKey: 'owner_id' })
+
+User.belongsToMany(User, {
+  through: 'user_friends',
+  as: 'friends',
+  foreignKey: 'user_id',
+  otherKey: 'friend_id'
+})
 
 export default User

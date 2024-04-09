@@ -24,14 +24,14 @@ if (!global.atob) {
   global.atob = decode;
 }
 
-// AsyncStorage.clear();
-
-const App = () => (
-  <NavigationContainer theme={MyTheme}>
-    <ContextProvider>
-      <RootNavigator />
-    </ContextProvider>
-  </NavigationContainer>
-);
+const App = () => {
+  return (
+    <NavigationContainer theme={MyTheme}>
+      <ContextProvider>
+        <RootNavigator />
+      </ContextProvider>
+    </NavigationContainer>
+  );
+};
 
 export default App;

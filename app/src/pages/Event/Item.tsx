@@ -18,13 +18,17 @@ const width =
   Dimensions.get('window').width - 2 * Style.container.paddingHorizontal;
 
 interface ItemProps {
-  item: Event;
+  item: Event | null;
   fullwidth?: boolean;
   onPress: (event: GestureResponderEvent) => void;
 }
 
 const Item = ({fullwidth, item, onPress}: ItemProps) => {
-  const {title, description, link, background} = item;
+  if (!item) {
+    return null;
+  }
+
+  const {name, description, link, background} = item;
 
   const computedWidth = fullwidth ? width : (width - Gap) / 2;
 
@@ -39,7 +43,7 @@ const Item = ({fullwidth, item, onPress}: ItemProps) => {
       activeOpacity={StyleConstant.hover.opacity}>
       {link && <CustomImage source={linkIcon} width={20} />}
       <View style={styles.texts}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title}>{name}</Text>
         {description && <Text style={styles.desc}>{description}</Text>}
       </View>
     </TouchableOpacity>

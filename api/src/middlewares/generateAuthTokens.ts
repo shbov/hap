@@ -5,8 +5,7 @@ import * as refreshTokenDal from '../db/dal/refreshToken'
 import * as userDal from '../db/dal/user'
 import { generateJWT } from '../utils/generateJWT'
 
-const { ACCESS_TOKEN_LIFE, REFRESH_TOKEN_LIFE, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, NODE_ENV } = process.env
-const dev = NODE_ENV === 'development'
+const { ACCESS_TOKEN_LIFE, REFRESH_TOKEN_LIFE, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
 
 export const generateAuthTokens = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -20,8 +19,6 @@ export const generateAuthTokens = async (req: Request, res: Response, next: Next
     }
 
     const refreshToken = generateJWT(req.userId, REFRESH_TOKEN_SECRET!, REFRESH_TOKEN_LIFE!)
-    const accessToken = generateJWT(req.userId, ACCESS_TOKEN_SECRET!, ACCESS_TOKEN_LIFE!)
-
     const refreshTokenInDB = await refreshTokenDal.createRefreshToken({
       token: refreshToken,
       user_id: req.userId,
@@ -29,13 +26,13 @@ export const generateAuthTokens = async (req: Request, res: Response, next: Next
     })
 
     res.cookie('refreshToken', refreshTokenInDB.token, {
-      httpOnly: true,
-      secure: !dev,
+      httpOnly: false,
       signed: true,
       expires: new Date(Date.now() + ms(REFRESH_TOKEN_LIFE!))
     })
 
     const expiresAt = new Date(Date.now() + ms(ACCESS_TOKEN_LIFE!))
+    const accessToken = generateJWT(req.userId, ACCESS_TOKEN_SECRET!, ACCESS_TOKEN_LIFE!)
     return res.status(200).json({
       user,
       token: accessToken,

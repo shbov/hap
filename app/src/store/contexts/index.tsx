@@ -1,7 +1,7 @@
 import React, {useMemo, useReducer} from 'react';
 
 import {initialState, UserContext} from './user.context';
-import {userReducer} from '../reducers/user.reducer';
+import {userReducer} from '../reducers/user.reducer.ts';
 
 interface Props {
   children: React.ReactNode;
@@ -10,15 +10,15 @@ interface Props {
 const ContextProvider = ({children}: Props) => {
   const [state, dispatch] = useReducer(userReducer, initialState);
 
-  return (
-    <UserContext.Provider
-      value={useMemo(
-        () => ({userState: state, dispatchUser: dispatch}),
-        [state],
-      )}>
-      {children}
-    </UserContext.Provider>
+  const value = useMemo(
+    () => ({
+      state,
+      dispatch,
+    }),
+    [state],
   );
+
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 
 export default ContextProvider;

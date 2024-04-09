@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {ActivityIndicator, SafeAreaView, StyleSheet, View} from 'react-native';
 
 // eslint-disable-next-line import/no-unresolved
@@ -15,11 +15,10 @@ import CreateModal from '../pages/Event/CreateModal.tsx';
 import ViewEvent from '../pages/Event/ViewEvent.tsx';
 import Home from '../pages/Home.tsx';
 import OnboardingScreen from '../pages/OnboardingScreen.tsx';
-import {
-  getUserData,
-  Type,
-  UserContext,
-} from '../store/contexts/user.context.ts';
+import Profile from '../pages/Profile.tsx';
+import {updateAccessToken} from '../services/authentication/authentication.services.ts';
+import {Type, UserContext} from '../store/contexts/user.context.ts';
+import {STATUS} from '../store/reducers/user.reducer.ts';
 import {Colors, Style} from '../styles/Style.tsx';
 
 export const headerSettings = {
@@ -38,9 +37,62 @@ export const headerSettings = {
 };
 
 export const RootNavigator = () => {
+  const Stack = createNativeStackNavigator();
+
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingLoaded, setOnboardingLoaded] = useState(false);
-  const {userState, dispatchUser} = useContext(UserContext);
+  const {state, dispatch} = useContext(UserContext);
+
+  const refreshAccessToken = useCallback(async () => {
+    const response = await updateAccessToken();
+
+    try {
+      if (response.status === 200) {
+        const {data} = response;
+
+        dispatch({
+          type: Type.LOGGED_IN_SUCCESSFUL,
+          payload: {
+            user: {
+              id: data.user.id,
+              name: data.user.name,
+              phone: data.user.phone,
+            },
+            token: data.accessToken,
+            expiresAt: new Date(data.expiresAt),
+          },
+        });
+      } else {
+        dispatch({
+          type: Type.LOGIN_FAILED,
+        });
+      }
+    } catch (err) {
+      dispatch({
+        type: Type.LOGIN_FAILED,
+      });
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    refreshAccessToken();
+  }, [refreshAccessToken]);
+
+  useEffect(() => {
+    let refreshAccessTokenTimerId: NodeJS.Timeout;
+
+    if (state.isAuthenticated) {
+      refreshAccessTokenTimerId = setTimeout(() => {
+        refreshAccessToken();
+      }, new Date(state.expiresAt).getTime() - Date.now() - 10 * 1000);
+    }
+
+    return () => {
+      if (state.isAuthenticated && refreshAccessTokenTimerId) {
+        clearTimeout(refreshAccessTokenTimerId);
+      }
+    };
+  }, [dispatch, refreshAccessToken, state.expiresAt, state.isAuthenticated]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -62,26 +114,20 @@ export const RootNavigator = () => {
         setShowOnboarding(false);
       }
     };
-    const fetch2 = async () => {
-      const value = await getUserData();
-      if (!value) {
-        return dispatchUser({
-          type: Type.LOGIN_FAILED,
-        });
-      }
 
-      dispatchUser({
-        type: Type.LOGGED_IN_SUCCESSFUL,
-        value,
-      });
-    };
+    fetch().then(r => r);
+  }, [dispatch]);
 
-    fetch();
-    fetch2();
-    // eslint-disable-next-line
-  }, [])
+  useEffect(() => {
+    console.log('status', state.status);
+  }, [state.status]);
 
-  if (userState.isLoading) {
+  if (
+    !state ||
+    state?.status === STATUS.PENDING ||
+    state?.status === STATUS.LOADING ||
+    !onboardingLoaded
+  ) {
     return (
       <SafeAreaView style={{...Style.centered, ...Style.container, flex: 1}}>
         <View style={styles.loading}>
@@ -89,12 +135,6 @@ export const RootNavigator = () => {
         </View>
       </SafeAreaView>
     );
-  }
-
-  const Stack = createNativeStackNavigator();
-
-  if (!onboardingLoaded) {
-    return null;
   }
 
   return (
@@ -109,7 +149,7 @@ export const RootNavigator = () => {
         />
       )}
 
-      {!userState.isAuthenticated ? (
+      {!state.isAuthenticated ? (
         <>
           <Stack.Screen
             name="AuthHome"
@@ -141,18 +181,26 @@ export const RootNavigator = () => {
             options={{headerShown: false}}
           />
           <Stack.Screen
+            name="Profile"
+            component={Profile}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
             name="ViewEvent"
             component={ViewEvent}
             options={({route}) => ({
               ...headerSettings,
 
-              title: route.params?.event.title,
+              title: route.params?.event.name,
               headerLeft: GoBackButton,
               headerStyle: styles.header,
               headerRight: ShowMoreButton,
             })}
           />
-          <Stack.Group screenOptions={{presentation: 'modal'}}>
+          <Stack.Group
+            screenOptions={{
+              presentation: 'modal',
+            }}>
             <Stack.Screen
               name={'CreateEvent'}
               component={CreateModal}

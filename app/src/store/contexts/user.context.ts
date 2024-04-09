@@ -3,47 +3,63 @@ import React, {createContext} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {jwtDecode} from 'jwt-decode';
 
+import {STATUS} from '../reducers/user.reducer.ts';
+
 export interface UserState {
   id: string;
   name: string;
   email: string;
   phone: string;
   token: string;
-
-  isAuthenticated: boolean;
-  isLoading: boolean;
 }
 
-export const initialState: UserState = {
-  id: '',
-  name: '',
-  email: '',
-  phone: '',
-  token: '',
+export interface State {
+  user: UserState;
+  token: string | null;
+  expiresAt: string;
+  isAuthenticated: boolean;
+  status: STATUS;
+}
 
+export const initialState: State = {
+  user: {
+    id: '',
+    name: '',
+    email: '',
+    phone: '',
+    token: '',
+  },
+
+  token: null,
+  expiresAt: '',
   isAuthenticated: false,
-  isLoading: true,
+  status: STATUS.PENDING,
 };
 
 export enum Type {
   LOGGED_IN_SUCCESSFUL = 'LOGGED_IN_SUCCESSFUL',
   LOGIN_FAILED = 'LOGIN_FAILED',
-  LOGGING = 'LOGGING',
+
+  LOGOUT = 'LOGOUT',
+  UPDATE_USER = 'UPDATE_USER',
+  STATUS = 'STATUS',
+
+  UPDATE_TOKEN = 'UPDATE_TOKEN',
 }
 
 export interface Action {
   type: Type;
-  value?: UserState;
+  payload?: any;
 }
 
 export interface Context {
-  userState: UserState;
-  dispatchUser: React.Dispatch<Action>;
+  state: State;
+  dispatch: React.Dispatch<Action>;
 }
 
 const initial: Context = {
-  userState: initialState,
-  dispatchUser: () => {},
+  state: initialState,
+  dispatch: () => {},
 };
 
 export const getUserData = async (): Promise<UserState | null> => {
@@ -53,14 +69,9 @@ export const getUserData = async (): Promise<UserState | null> => {
       return null;
     }
 
-    const decoded = jwtDecode(token ?? '') as Omit<
-      UserState,
-      'isLoading' | 'isAuthenticated'
-    >;
+    const decoded = jwtDecode<UserState>(token);
     if (decoded.id !== null) {
       return {
-        isLoading: false,
-        isAuthenticated: true,
         id: decoded.id,
         name: decoded.name,
         email: decoded.email,

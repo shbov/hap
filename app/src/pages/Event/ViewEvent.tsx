@@ -1,9 +1,17 @@
 import React from 'react';
 import {SafeAreaView, ScrollView, StyleSheet, Text} from 'react-native';
 
+import {ScreenStackProps} from 'react-native-screens';
+
 import {Style} from '../../styles/Style.tsx';
 
-const ViewEvent = () => {
+interface ScreenProps {
+  route: any;
+}
+
+const ViewEvent = ({route}: ScreenProps) => {
+  const {event} = route.params;
+
   return (
     <SafeAreaView style={styles.main}>
       <ScrollView style={styles.container}>
