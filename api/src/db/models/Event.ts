@@ -45,6 +45,23 @@ class Event extends Model {
 
     return await Interval.findByPk(this.chosen_interval)
   }
+
+  async attachChosenInterval(interval: Interval) {
+    await this.update({ chosen_interval: interval.id })
+  }
+
+  async attachInterval(interval: Interval) {
+    await interval.update({ event_id: this.id })
+  }
+
+  async getParticipants() {
+    return await User.findAll({
+      include: {
+        model: Event,
+        where: { id: this.id }
+      }
+    })
+  }
 }
 
 Event.init(

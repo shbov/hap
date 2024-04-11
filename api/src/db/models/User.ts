@@ -3,6 +3,8 @@ import { DataTypes, Model, Optional } from 'sequelize'
 import sequelizeConnection from '../config'
 import Event from './Event'
 import EventUser from './EventUser'
+import FriendRequest from './FriendRequest'
+import Friends from './Friends'
 import Interval from './Interval'
 import Notification from './Notification'
 
@@ -67,7 +69,73 @@ class User extends Model {
     })
 
     // @ts-ignore
-    return user.friends
+    return user?.friends
+  }
+
+  async getFriendRequests() {
+    return await User.findAll({
+      include: [
+        {
+          model: User,
+          as: 'friends',
+          where: {
+            id: this.id
+          }
+        }
+      ]
+    })
+  }
+
+  async getFriendRequestsSent() {
+    return await User.findAll({
+      include: [
+        {
+          model: User,
+          as: 'friends',
+          where: {
+            id: this.id
+          }
+        }
+      ]
+    })
+  }
+
+  async addFriend(friendId: number) {
+    const friend = await User.findByPk(friendId)
+    if (!friend) {
+      return null
+    }
+
+    return await Friends.create({
+      user_id: this.id,
+      friend_id: friendId
+    })
+  }
+
+  async removeFriend(friendId: number) {
+    const friend = await User.findByPk(friendId)
+    if (!friend) {
+      return null
+    }
+
+    return Friends.destroy({
+      where: {
+        user_id: this.id,
+        friend_id: friendId
+      }
+    })
+  }
+
+  async addFriendRequest(friendId: number) {
+    const friend = await User.findByPk(friendId)
+    if (!friend) {
+      return null
+    }
+
+    return await FriendRequest.create({
+      user_id: this.id,
+      friend_id: friendId
+    })
   }
 }
 

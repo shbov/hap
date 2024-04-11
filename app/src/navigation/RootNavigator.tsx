@@ -11,6 +11,7 @@ import ShowMoreButton from '../components/Buttons/ShowMoreButton.tsx';
 import AuthHome from '../pages/Auth/AuthHome.tsx';
 import Login from '../pages/Auth/Login.tsx';
 import Register from '../pages/Auth/Register/Register.tsx';
+import CreateEvent from '../pages/Event/CreateEvent.tsx';
 import CreateModal from '../pages/Event/CreateModal.tsx';
 import ViewEvent from '../pages/Event/ViewEvent.tsx';
 import Home from '../pages/Home.tsx';
@@ -186,6 +187,30 @@ export const RootNavigator = () => {
             options={{headerShown: false}}
           />
           <Stack.Screen
+            name={'CreateEvent'}
+            component={CreateEvent}
+            options={{
+              ...headerSettings,
+
+              title: 'Новая встреча',
+              headerLeft: GoBackButton,
+              headerStyle: styles.header,
+            }}
+          />
+          <Stack.Group
+            screenOptions={{
+              presentation: 'modal',
+            }}>
+            <Stack.Screen
+              name={'CreateModal'}
+              component={CreateModal}
+              options={{
+                ...headerSettings,
+                title: 'Новая встреча',
+              }}
+            />
+          </Stack.Group>
+          <Stack.Screen
             name="ViewEvent"
             component={ViewEvent}
             options={({route}) => ({
@@ -197,19 +222,6 @@ export const RootNavigator = () => {
               headerRight: ShowMoreButton,
             })}
           />
-          <Stack.Group
-            screenOptions={{
-              presentation: 'modal',
-            }}>
-            <Stack.Screen
-              name={'CreateEvent'}
-              component={CreateModal}
-              options={{
-                ...headerSettings,
-                title: 'Новая встреча',
-              }}
-            />
-          </Stack.Group>
         </>
       )}
     </Stack.Navigator>
@@ -226,6 +238,8 @@ const styles = StyleSheet.create({
     letterSpacing: -0.408,
 
     color: Colors.dark,
+
+    backgroundColor: Colors.background,
   },
 
   loading: {

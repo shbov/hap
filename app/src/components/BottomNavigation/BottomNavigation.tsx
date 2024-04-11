@@ -48,7 +48,7 @@ const BottomNavigation = () => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.add}
-        onPress={() => navigation.navigate('CreateEvent')}
+        onPress={() => navigation.navigate('CreateModal')}
         activeOpacity={StyleConstant.hover.opacity}>
         <CustomImage
           source={require('../../../assets/images/plus.png')}
