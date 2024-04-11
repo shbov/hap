@@ -1,9 +1,11 @@
 import React, {useState} from 'react';
-import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import {SafeAreaView, StyleSheet, Text, TextInput, View} from 'react-native';
 
+import {useNavigation} from '@react-navigation/native';
 import CalendarPicker, {ChangedDate} from 'react-native-calendar-picker';
 
 import {Colors} from '../../styles/Style.tsx';
+import { createEvent } from '../../services/event/event.services.ts'
 
 interface Dates {
   selectedStartDate: Date | null;
@@ -15,7 +17,18 @@ const CreateEvent = ({route}) => {
     params: {type: eventType},
   } = route;
 
+  const navigation = useNavigation();
+
+  const [form, setForm] = useState({
+    id: '';
+    name: '';
+    description: '';
+    intervals: [],
+    type: eventType,
+  });
+
   const [selectedDays, setSelectedDays] = useState<Dates>({});
+  const [selectedIntervals, setSelectedIntervals] = useState<string[]>([]);
   const setSelected = (date: Date, type: ChangedDate) => {
     if (type === 'END_DATE') {
       setSelectedDays({
@@ -30,9 +43,15 @@ const CreateEvent = ({route}) => {
     }
   };
 
+  const onSubmit = () => {
+    createEvent(form).then(res => {
+      navigation.navigate('Event', {id: res.id});
+    });
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.calendar}>
+      <View style={styles.calendar} form={form} onSubmit={onSubmit}>
         <CalendarPicker
           onDateChange={setSelected}
           allowRangeSelection
@@ -61,6 +80,21 @@ const CreateEvent = ({route}) => {
           todayTextStyle={{
             color: Colors.dark,
           }}
+        />
+
+        <SelectIntevals
+          name="form.intervals"
+          selectedDays={selectedIntervals}
+          setSelectedDays={setSelectedIntervals}
+        />
+
+        <TextInput
+          placeholder="Название"
+          onChangeText={title => setForm({...form, title})}
+        />
+        <TextInput
+          placeholder="Описание"
+          onChangeText={description => setForm({...form, description})}
         />
       </View>
     </SafeAreaView>

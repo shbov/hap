@@ -13,7 +13,7 @@ export const generateAuthTokens = async (req: Request, res: Response, next: Next
       return res.sendStatus(204)
     }
 
-    const user = await userDal.getById(req.userId)
+    const user = await userDal.getByIdWithoutCredentials(req.userId)
     if (!user) {
       return res.sendStatus(204)
     }

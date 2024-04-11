@@ -75,7 +75,10 @@ const Profile = () => {
         <View style={styles.wrapper}>
           <Text style={styles.name}>{data.user.name}</Text>
         </View>
-        <View style={styles.cards}>
+
+        <View
+          style={styles.cards}
+          onPress={() => navigation.navigate('Events' as never)}>
           <View style={styles.card}>
             <Text style={styles.cardNumber}>{data.events}</Text>
             <Text style={styles.desc}>
@@ -83,7 +86,9 @@ const Profile = () => {
             </Text>
           </View>
 
-          <View style={styles.card}>
+          <View
+            style={styles.card}
+            onPress={() => navigation.navigate('Friends' as never)}>
             <Text style={styles.cardNumber}>{data.friends}</Text>
             <Text style={styles.desc}>
               {declOfNum(data.friends, ['Друг', 'Друга', 'Друзей'])}

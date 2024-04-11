@@ -192,3 +192,43 @@ export const updateAccessToken = async () => {
     };
   }
 };
+
+export const logoutUserService = async () => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    if (!token) {
+      return {
+        status: 401,
+        message: 'Unauthorized',
+      };
+    }
+
+    const response = await fetch(API_URL + '/api/v1/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const responseData = await response.json();
+    if (response.status !== 200) {
+      return {
+        status: response.status,
+        message: responseData.message,
+      };
+    }
+
+    return {
+      status: response.status,
+      data: responseData,
+    };
+  } catch (error) {
+    return {
+      status: 500,
+      message: 'Request failed, Please try again!',
+    };
+  }
+};
