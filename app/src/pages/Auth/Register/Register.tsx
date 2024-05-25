@@ -141,6 +141,7 @@ const Register = () => {
       return;
     }
 
+    // @ts-ignore
     setStep(routeName);
   }, [routeName]);
 

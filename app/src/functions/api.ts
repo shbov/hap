@@ -1,3 +1,5 @@
+// @ts-ignore
+// eslint-disable-next-line import/no-unresolved
 import {APP_BACKEND_URL} from '@env';
 
 export const makeUrl = (...params: string[]) => {

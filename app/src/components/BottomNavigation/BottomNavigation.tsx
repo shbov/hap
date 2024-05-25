@@ -40,7 +40,10 @@ const BottomNavigation = () => {
       <TouchableOpacity
         style={styles.icon}
         activeOpacity={StyleConstant.hover.opacity}
-        onPress={() => navigation.navigate('Home')}>
+        onPress={() => {
+          // @ts-ignore
+          navigation.navigate('Home');
+        }}>
         <CustomImage
           source={require('../../../assets/images/list.png')}
           width={32}
@@ -48,7 +51,10 @@ const BottomNavigation = () => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.add}
-        onPress={() => navigation.navigate('CreateModal')}
+        onPress={() => {
+          // @ts-ignore
+          navigation.navigate('CreateModal');
+        }}
         activeOpacity={StyleConstant.hover.opacity}>
         <CustomImage
           source={require('../../../assets/images/plus.png')}
@@ -58,7 +64,10 @@ const BottomNavigation = () => {
       <TouchableOpacity
         style={styles.icon}
         activeOpacity={StyleConstant.hover.opacity}
-        onPress={() => navigation.navigate('Profile')}>
+        onPress={() => {
+          // @ts-ignore
+          navigation.navigate('Profile');
+        }}>
         <CustomImage
           source={require('../../../assets/images/profile.png')}
           width={32}

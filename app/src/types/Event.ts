@@ -1,3 +1,8 @@
+interface Interval {
+  started_at: Date;
+  ended_at: Date;
+}
+
 export interface Event {
   id: string;
   name: string;
@@ -5,4 +10,6 @@ export interface Event {
   fullwidth?: boolean;
   link?: string;
   background?: string;
+
+  chosen_interval?: Interval;
 }

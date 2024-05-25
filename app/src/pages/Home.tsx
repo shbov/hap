@@ -27,7 +27,7 @@ const Section = {
 export const Gap = 16;
 const getUpcomingEvent = (events: Event[]) => {
   return events.find(
-    e => new Date(e?.choosen_interval?.started_at) > new Date(),
+    e => new Date(e?.chosen_interval?.started_at ?? 0) > new Date(),
   );
 };
 

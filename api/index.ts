@@ -5,7 +5,7 @@ import dotenv from 'dotenv'
 import express, { Express, NextFunction, Request, Response } from 'express'
 
 import routes from './src/routes'
-import { Error } from './src/types/Error'
+import { CustomError } from './src/types/CustomError'
 
 dotenv.config()
 const port = process.env.PORT ?? 3000
@@ -30,7 +30,7 @@ app.use(bodyParser.json())
 app.use(cookieParser(process.env.COOKIE_SECRET))
 app.use('/api/v1', routes)
 
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((error: CustomError, req: Request, res: Response, next: NextFunction) => {
   console.error('\x1b[31m', error)
   if (res.headersSent) {
     return next(error)

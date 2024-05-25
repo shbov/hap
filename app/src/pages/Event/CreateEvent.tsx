@@ -2,8 +2,10 @@ import React, {useState} from 'react';
 import {SafeAreaView, StyleSheet, Text, TextInput, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
+import {Formik} from 'formik';
 import CalendarPicker, {ChangedDate} from 'react-native-calendar-picker';
 
+import {SelectIntervals} from '../../components/SelectIntervals/SelectIntervals.tsx';
 import {createEvent} from '../../services/event/event.services.ts';
 import {Colors} from '../../styles/Style.tsx';
 
@@ -12,22 +14,42 @@ interface Dates {
   selectedEndDate: Date | null;
 }
 
-const CreateEvent = ({route}) => {
+interface Form {
+  id: string;
+  name: string;
+  description: string;
+  intervals: string[];
+  type: string;
+}
+
+const CreateEvent = ({
+  route,
+}: {
+  route: {
+    params: {
+      type: string;
+    };
+  };
+}) => {
   const {
     params: {type: eventType},
   } = route;
 
   const navigation = useNavigation();
-
-  const [form, setForm] = useState({
+  const initialValues = {
     id: '',
     name: '',
     description: '',
     intervals: [],
     type: eventType,
-  });
+  };
 
-  const [selectedDays, setSelectedDays] = useState<Dates>({});
+  const [form, setForm] = useState<Form>(initialValues);
+
+  const [selectedDays, setSelectedDays] = useState<Dates>({
+    selectedEndDate: null,
+    selectedStartDate: null,
+  });
   const [selectedIntervals, setSelectedIntervals] = useState<string[]>([]);
   const setSelected = (date: Date, type: ChangedDate) => {
     if (type === 'END_DATE') {
@@ -46,59 +68,63 @@ const CreateEvent = ({route}) => {
   const onSubmit = () => {
     createEvent(form).then(res => {
       if (res.event) {
+        // @ts-ignore
         return navigation.navigate('Event', {id: res.event.id});
       }
     });
   };
 
+  const onChangeTitle = (name: string) => {
+    setForm({...form, name});
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.calendar} form={form} onSubmit={onSubmit}>
-        <CalendarPicker
-          onDateChange={setSelected}
-          allowRangeSelection
-          startFromMonday
-          previousTitle={'<'}
-          nextTitle={'>'}
-          selectedDayTextColor={Colors.white}
-          selectedDayColor={Colors.primary}
-          todayBackgroundColor={'none'}
-          scaleFactor={375}
-          weekdays={['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']}
-          months={[
-            'Январь',
-            'Февраль',
-            'Март',
-            'Апрель',
-            'Май',
-            'Июнь',
-            'Июль',
-            'Август',
-            'Сентябрь',
-            'Октябрь',
-            'Ноябрь',
-            'Декабрь',
-          ]}
-          todayTextStyle={{
-            color: Colors.dark,
-          }}
-        />
+      <Formik form={form} onSubmit={onSubmit} initialValues={initialValues}>
+        <View style={styles.calendar}>
+          <CalendarPicker
+            onDateChange={setSelected}
+            allowRangeSelection
+            startFromMonday
+            previousTitle={'<'}
+            nextTitle={'>'}
+            selectedDayTextColor={Colors.white}
+            selectedDayColor={Colors.primary}
+            todayBackgroundColor={'none'}
+            scaleFactor={375}
+            weekdays={['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']}
+            months={[
+              'Январь',
+              'Февраль',
+              'Март',
+              'Апрель',
+              'Май',
+              'Июнь',
+              'Июль',
+              'Август',
+              'Сентябрь',
+              'Октябрь',
+              'Ноябрь',
+              'Декабрь',
+            ]}
+            todayTextStyle={{
+              color: Colors.dark,
+            }}
+          />
 
-        <SelectIntevals
-          name="form.intervals"
-          selectedDays={selectedIntervals}
-          setSelectedDays={setSelectedIntervals}
-        />
+          <SelectIntervals
+            name="form.intervals"
+            selectedDays={selectedIntervals}
+            setSelectedDays={setSelectedIntervals}
+          />
 
-        <TextInput
-          placeholder="Название"
-          onChangeText={title => setForm({...form, title})}
-        />
-        <TextInput
-          placeholder="Описание"
-          onChangeText={description => setForm({...form, description})}
-        />
-      </View>
+          <TextInput placeholder="Название" onChangeText={onChangeTitle} />
+          <TextInput
+            placeholder="Описание"
+            onChangeText={description => setForm({...form, description})}
+          />
+        </View>
+      </Formik>
     </SafeAreaView>
   );
 };

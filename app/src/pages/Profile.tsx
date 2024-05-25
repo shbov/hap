@@ -32,7 +32,7 @@ interface Props {
 }
 
 const Profile = () => {
-  const [data, setData] = useState<Props>(null);
+  const [data, setData] = useState<Props>({} as Props);
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
