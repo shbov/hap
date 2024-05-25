@@ -14,7 +14,11 @@ interface EventAttributes {
   chosen_interval: number | null
 }
 
-export interface EventInput extends Optional<EventAttributes, 'id' | 'image' | 'chosen_interval' | 'description'> {}
+export interface EventInput
+  extends Optional<
+    EventAttributes,
+    'id' | 'image' | 'chosen_interval' | 'description'
+  > {}
 
 export interface EventOutput extends Required<EventAttributes> {}
 

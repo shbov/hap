@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {SafeAreaView, StyleSheet, Text, TextInput, View} from 'react-native';
+import {SafeAreaView, StyleSheet, TextInput, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {Formik} from 'formik';

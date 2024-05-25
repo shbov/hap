@@ -13,10 +13,15 @@ const config: Config = {
   db: process.env.DB_NAME as string
 }
 
-const sequelizeConnection = new Sequelize(config.db, config.user, config.password, {
-  host: config.host,
-  port: config.port,
-  dialect: 'postgres'
-})
+const sequelizeConnection = new Sequelize(
+  config.db,
+  config.user,
+  config.password,
+  {
+    host: config.host,
+    port: config.port,
+    dialect: 'postgres'
+  }
+)
 
 export default sequelizeConnection

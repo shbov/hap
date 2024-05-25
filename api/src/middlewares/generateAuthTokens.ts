@@ -5,9 +5,18 @@ import * as refreshTokenDal from '../db/dal/refreshToken'
 import * as userDal from '../db/dal/user'
 import { generateJWT } from '../utils/generateJWT'
 
-const { ACCESS_TOKEN_LIFE, REFRESH_TOKEN_LIFE, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
+const {
+  ACCESS_TOKEN_LIFE,
+  REFRESH_TOKEN_LIFE,
+  ACCESS_TOKEN_SECRET,
+  REFRESH_TOKEN_SECRET
+} = process.env
 
-export const generateAuthTokens = async (req: Request, res: Response, next: NextFunction) => {
+export const generateAuthTokens = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     if (!req.userId) {
       return res.sendStatus(204)
@@ -18,7 +27,11 @@ export const generateAuthTokens = async (req: Request, res: Response, next: Next
       return res.sendStatus(204)
     }
 
-    const refreshToken = generateJWT(req.userId, REFRESH_TOKEN_SECRET!, REFRESH_TOKEN_LIFE!)
+    const refreshToken = generateJWT(
+      req.userId,
+      REFRESH_TOKEN_SECRET!,
+      REFRESH_TOKEN_LIFE!
+    )
     const refreshTokenInDB = await refreshTokenDal.createRefreshToken({
       token: refreshToken,
       user_id: req.userId,
@@ -32,7 +45,11 @@ export const generateAuthTokens = async (req: Request, res: Response, next: Next
     })
 
     const expiresAt = new Date(Date.now() + ms(ACCESS_TOKEN_LIFE!))
-    const accessToken = generateJWT(req.userId, ACCESS_TOKEN_SECRET!, ACCESS_TOKEN_LIFE!)
+    const accessToken = generateJWT(
+      req.userId,
+      ACCESS_TOKEN_SECRET!,
+      ACCESS_TOKEN_LIFE!
+    )
     return res.status(200).json({
       user,
       token: accessToken,

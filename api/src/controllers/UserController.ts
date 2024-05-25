@@ -4,7 +4,11 @@ import { validationResult } from 'express-validator'
 import * as userDal from '../db/dal/user'
 
 export class UserController {
-  public static async getUserData(req: Request, res: Response, next: NextFunction) {
+  public static async getUserData(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     const result = validationResult(req)
     if (!result.isEmpty()) {
       return res.status(400).send({ errors: result.array() })
@@ -29,7 +33,11 @@ export class UserController {
     }
   }
 
-  public static getNotifications = async (req: Request, res: Response, next: NextFunction) => {
+  public static getNotifications = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const user = req.userId
       if (!user) {
@@ -46,7 +54,11 @@ export class UserController {
     }
   }
 
-  public static getFriends = async (req: Request, res: Response, next: NextFunction) => {
+  public static getFriends = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const user = req.userId
       if (!user) {
@@ -63,7 +75,11 @@ export class UserController {
     }
   }
 
-  public static getFriendRequests = async (req: Request, res: Response, next: NextFunction) => {
+  public static getFriendRequests = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const user = req.userId
       if (!user) {
@@ -80,7 +96,11 @@ export class UserController {
     }
   }
 
-  public static async addFriend(req: Request, res: Response, next: NextFunction) {
+  public static async addFriend(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     const result = validationResult(req)
     if (!result.isEmpty()) {
       return res.status(400).send({ errors: result.array() })
@@ -94,7 +114,9 @@ export class UserController {
 
       const { friend_id } = req.body
 
-      console.log(`[UserController::addFriend] id: ${user} friend_id: ${friend_id}`)
+      console.log(
+        `[UserController::addFriend] id: ${user} friend_id: ${friend_id}`
+      )
 
       await userDal.sendFriendRequest(user, friend_id)
 
@@ -104,7 +126,11 @@ export class UserController {
     }
   }
 
-  public static async acceptFriendRequest(req: Request, res: Response, next: NextFunction) {
+  public static async acceptFriendRequest(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     const result = validationResult(req)
     if (!result.isEmpty()) {
       return res.status(400).send({ errors: result.array() })
@@ -118,7 +144,9 @@ export class UserController {
 
       const { friend_id } = req.body
 
-      console.log(`[UserController::acceptFriendRequest] id: ${user} friend_id: ${friend_id}`)
+      console.log(
+        `[UserController::acceptFriendRequest] id: ${user} friend_id: ${friend_id}`
+      )
 
       await userDal.acceptFriendRequest(user, friend_id)
 

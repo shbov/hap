@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   extends: ['@react-native', 'plugin:import/recommended'],
-
+  plugins: ['jest'],
   parserOptions: {
     sourceType: 'module',
     ecmaVersion: 'latest',

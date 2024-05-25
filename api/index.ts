@@ -30,19 +30,21 @@ app.use(bodyParser.json())
 app.use(cookieParser(process.env.COOKIE_SECRET))
 app.use('/api/v1', routes)
 
-app.use((error: CustomError, req: Request, res: Response, next: NextFunction) => {
-  console.error('\x1b[31m', error)
-  if (res.headersSent) {
-    return next(error)
-  }
-
-  return res.status(error.status || 500).json({
-    error: {
-      status: error.status || 500,
-      message: error.status ? error.message : 'Internal Server Error'
+app.use(
+  (error: CustomError, req: Request, res: Response, next: NextFunction) => {
+    console.error('\x1b[31m', error)
+    if (res.headersSent) {
+      return next(error)
     }
-  })
-})
+
+    return res.status(error.status || 500).json({
+      error: {
+        status: error.status || 500,
+        message: error.status ? error.message : 'Internal Server Error'
+      }
+    })
+  }
+)
 
 app.get('*', function (req, res) {
   res.status(404)

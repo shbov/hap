@@ -1,13 +1,16 @@
 import React, {useEffect} from 'react';
 import {SafeAreaView, StyleSheet, View} from 'react-native';
 
-import {ONBOARDING_KEY} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 
+import {AppConfig} from '../../app.config.ts';
 import PrimaryButton from '../components/Buttons/PrimaryButton';
 import CarouselCards from '../components/Carousel/CarouselCards';
 import {Colors, Style} from '../styles/Style.tsx';
 import {CarouselItem} from '../types/CarouselItem.ts';
+
+const {ONBOARDING_KEY} = Constants.manifest?.extra as AppConfig;
 
 export interface OnboardingProps {
   onPress: () => void;

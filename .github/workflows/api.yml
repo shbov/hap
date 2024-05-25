@@ -1,0 +1,45 @@
+name: api
+
+on: [push, pull_request]
+env:
+    working-directory: api
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: api/.node-version
+          cache: yarn
+
+      - name: Install Dependencies
+        id: install
+        run: yarn install --frozen-lockfile
+        working-directory: ${{ env.working-directory }}
+
+      - name: Check Format
+        id: yarn-format-check
+        run: yarn run format:check
+        working-directory: ${{ env.working-directory }}
+
+      - name: Lint
+        id: yarn-lint
+        run: yarn run lint
+        working-directory: ${{ env.working-directory }}
+
+      - name: Test
+        id: yarn-ci-test
+        run: yarn run test
+        working-directory: ${{ env.working-directory }}

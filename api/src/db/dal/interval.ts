@@ -12,7 +12,10 @@ export const getById = async (id: number): Promise<Interval | null> => {
   return await Interval.findByPk(id)
 }
 
-export const update = async (id: number, payload: IntervalRequest): Promise<Interval | null> => {
+export const update = async (
+  id: number,
+  payload: IntervalRequest
+): Promise<Interval | null> => {
   const interval = await getById(id)
   if (!interval) {
     return null
