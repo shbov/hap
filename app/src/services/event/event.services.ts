@@ -9,6 +9,12 @@ interface Response {
   events: Event[];
 }
 
+interface EventResponse {
+  status: number;
+  message?: string;
+  event: Event | null;
+}
+
 export const getEvents = async (): Promise<Response> => {
   try {
     const token = await AsyncStorage.getItem('token');
@@ -44,7 +50,7 @@ export const getEvents = async (): Promise<Response> => {
   }
 };
 
-export const getEventById = async (id: number): Promise<Response> => {
+export const getEventById = async (id: number): Promise<EventResponse> => {
   try {
     const token = await AsyncStorage.getItem('token');
     const response = await fetch(API_URL + `/api/v1/event/${id}`, {
@@ -62,24 +68,24 @@ export const getEventById = async (id: number): Promise<Response> => {
       return {
         status: response.status,
         message: responseData.errors[0],
-        events: [],
+        event: null,
       };
     }
 
     return {
       status: response.status,
-      events: responseData.events,
+      event: responseData.event,
     };
   } catch (error) {
     return {
       status: 500,
       message: 'Request failed, Please try again!',
-      events: [],
+      event: null,
     };
   }
 };
 
-export const createEvent = async (event: Event): Promise<Response> => {
+export const createEvent = async (event: Event): Promise<EventResponse> => {
   try {
     const token = await AsyncStorage.getItem('token');
     const response = await fetch(API_URL + '/api/v1/event', {
@@ -98,19 +104,19 @@ export const createEvent = async (event: Event): Promise<Response> => {
       return {
         status: response.status,
         message: responseData.errors[0],
-        events: [],
+        event: null,
       };
     }
 
     return {
       status: response.status,
-      events: responseData.events,
+      event: responseData.event,
     };
   } catch (error) {
     return {
       status: 500,
       message: 'Request failed, Please try again!',
-      events: [],
+      event: null,
     };
   }
 };

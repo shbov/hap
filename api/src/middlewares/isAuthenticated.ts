@@ -30,8 +30,6 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
     try {
       decodedToken = jwt.verify(accessToken, ACCESS_TOKEN_SECRET!) as { userId: number }
     } catch (err) {
-      console.log('accessToken', accessToken)
-      console.log('err', err)
       return next(createError.Unauthorized())
     }
 

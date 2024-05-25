@@ -4,8 +4,8 @@ import {SafeAreaView, StyleSheet, Text, TextInput, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import CalendarPicker, {ChangedDate} from 'react-native-calendar-picker';
 
+import {createEvent} from '../../services/event/event.services.ts';
 import {Colors} from '../../styles/Style.tsx';
-import { createEvent } from '../../services/event/event.services.ts'
 
 interface Dates {
   selectedStartDate: Date | null;
@@ -20,9 +20,9 @@ const CreateEvent = ({route}) => {
   const navigation = useNavigation();
 
   const [form, setForm] = useState({
-    id: '';
-    name: '';
-    description: '';
+    id: '',
+    name: '',
+    description: '',
     intervals: [],
     type: eventType,
   });
@@ -45,7 +45,9 @@ const CreateEvent = ({route}) => {
 
   const onSubmit = () => {
     createEvent(form).then(res => {
-      navigation.navigate('Event', {id: res.id});
+      if (res.event) {
+        return navigation.navigate('Event', {id: res.event.id});
+      }
     });
   };
 
