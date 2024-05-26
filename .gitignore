@@ -4,3 +4,5 @@ node_modules/
 
 .DS_Store
 api/uploads/
+
+app/ios/sentry.properties
