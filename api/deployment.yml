@@ -1,0 +1,19 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: hap-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hap-api
+  template:
+    metadata:
+      labels:
+        app: hap-api
+    spec:
+      containers:
+        - name: hap-api
+          image: 'shbov/hap-api:latest'
+          ports:
+            - containerPort: 80
