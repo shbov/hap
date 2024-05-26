@@ -1,9 +1,11 @@
-// @ts-ignore
-// eslint-disable-next-line import/no-unresolved
-import {APP_BACKEND_URL} from '@env';
+import Constants from 'expo-constants';
+
+import {AppConfig} from '../../app.config';
+
+const {API_URL} = Constants.manifest?.extra as AppConfig;
 
 export const makeUrl = (...params: string[]) => {
-  return [APP_BACKEND_URL, 'api', API_VERSION, ...params].join('/');
+  return [API_URL, 'api', API_VERSION, ...params].join('/');
 };
 
 export const API_VERSION = 'v1';

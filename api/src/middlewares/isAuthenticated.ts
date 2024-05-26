@@ -5,9 +5,13 @@ import jwt from 'jsonwebtoken'
 import * as refreshTokenDal from '../db/dal/refreshToken'
 import * as userDal from '../db/dal/user'
 
-const { ACCESS_TOKEN_LIFE, REFRESH_TOKEN_LIFE, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, NODE_ENV } = process.env
+const { ACCESS_TOKEN_SECRET } = process.env
 
-export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
+export const isAuthenticated = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const authToken = req.get('Authorization')
     const accessToken = authToken?.split('Bearer ')[1]
@@ -28,7 +32,9 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
 
     let decodedToken
     try {
-      decodedToken = jwt.verify(accessToken, ACCESS_TOKEN_SECRET!) as { userId: number }
+      decodedToken = jwt.verify(accessToken, ACCESS_TOKEN_SECRET!) as {
+        userId: number
+      }
     } catch (err) {
       return next(createError.Unauthorized())
     }

@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 
 import * as refreshTokenDal from '../db/dal/refreshToken'
 
 const dev = process.env.NODE_ENV === 'development'
 
-export const clearTokens = async (req: Request, res: Response, next?: NextFunction) => {
+export const clearTokens = async (req: Request, res: Response) => {
   const { signedCookies = {} } = req
   const { refreshToken } = signedCookies
 

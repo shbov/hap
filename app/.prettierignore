@@ -1,0 +1,7 @@
+dist/
+node_modules/
+coverage/
+vendor/
+ios/
+.expo/
+.bundle

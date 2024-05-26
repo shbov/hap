@@ -1,7 +1,12 @@
 import Event, { EventInput, EventOutput } from '../models/Event'
 import EventInvite from '../models/EventInvite'
 
-export const createEvent = async (id: number, name: string, description: string, image?: string) => {
+export const createEvent = async (
+  id: number,
+  name: string,
+  description: string,
+  image?: string
+) => {
   return await Event.create({ owner_id: id, name, description, image })
 }
 
@@ -29,7 +34,10 @@ export const getInvites = async (eventId: number) => {
   return await EventInvite.findAll({ where: { event_id: eventId } })
 }
 
-export const attachChosenInterval = async (event: Event, intervalId: number) => {
+export const attachChosenInterval = async (
+  event: Event,
+  intervalId: number
+) => {
   await event.update({ chosen_interval: intervalId })
 }
 

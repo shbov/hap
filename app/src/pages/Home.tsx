@@ -46,7 +46,7 @@ const Home = ({navigation}: NativeStackScreenProps<any>) => {
       setItems(events.filter(e => e.id !== upcomingEvent?.id));
       setLoading(false);
     });
-  }, []);
+  }, [upcomingEvent?.id]);
 
   const onPress = (event: Event | undefined) => {
     return (e: GestureResponderEvent) => {

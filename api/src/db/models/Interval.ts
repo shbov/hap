@@ -10,7 +10,8 @@ interface IntervalAttributes {
   finished_at: Date
 }
 
-export interface IntervalInput extends Optional<IntervalAttributes, 'id' | 'user_id'> {}
+export interface IntervalInput
+  extends Optional<IntervalAttributes, 'id' | 'user_id'> {}
 
 export interface IntervalOutput extends Required<IntervalAttributes> {}
 

@@ -1,11 +1,11 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {ActivityIndicator, SafeAreaView, StyleSheet, View} from 'react-native';
 
-// eslint-disable-next-line import/no-unresolved
-import {APP_ENV, ONBOARDING_KEY, ONBOARDING_SHOW_DEV} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import Constants from 'expo-constants';
 
+import {AppConfig} from '../../app.config.ts';
 import GoBackButton from '../components/Buttons/GoBackButton.tsx';
 import ShowMoreButton from '../components/Buttons/ShowMoreButton.tsx';
 import AuthHome from '../pages/Auth/AuthHome.tsx';
@@ -21,6 +21,9 @@ import {updateAccessToken} from '../services/authentication/authentication.servi
 import {Type, UserContext} from '../store/contexts/user.context.ts';
 import {STATUS} from '../store/reducers/user.reducer.ts';
 import {Colors, Style} from '../styles/Style.tsx';
+
+const {APP_ENV, ONBOARDING_KEY, ONBOARDING_SHOW_DEV} = Constants.manifest
+  ?.extra as AppConfig;
 
 export const headerSettings = {
   headerShadowVisible: false,

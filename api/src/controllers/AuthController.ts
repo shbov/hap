@@ -29,7 +29,9 @@ class AuthController {
       const phoneExists = await userDal.getByPhone(userPayload.phone)
       if (phoneExists) {
         console.log('[AuthController::signUp] phone already is use')
-        return res.status(400).send({ message: ['Такой номер телефона уже занят'] })
+        return res
+          .status(400)
+          .send({ message: ['Такой номер телефона уже занят'] })
       }
 
       const user = await userDal.create(userPayload)
@@ -68,13 +70,18 @@ class AuthController {
     }
   }
 
-  public static async logout(req: Request, res: Response, next: NextFunction) {
-    await clearTokens(req, res, next)
+  public static async logout(req: Request, res: Response) {
+    await clearTokens(req, res)
     return res.sendStatus(204)
   }
 
-  public static async refreshAccessToken(req: Request, res: Response, next: NextFunction) {
-    const { REFRESH_TOKEN_SECRET, ACCESS_TOKEN_SECRET, ACCESS_TOKEN_LIFE } = process.env
+  public static async refreshAccessToken(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { REFRESH_TOKEN_SECRET, ACCESS_TOKEN_SECRET, ACCESS_TOKEN_LIFE } =
+      process.env
 
     const { signedCookies } = req
     const { refreshToken } = signedCookies
@@ -83,22 +90,30 @@ class AuthController {
     }
 
     try {
-      const refreshTokenInDB = await refreshTokenDal.getRefreshToken(refreshToken)
+      const refreshTokenInDB =
+        await refreshTokenDal.getRefreshToken(refreshToken)
       if (!refreshTokenInDB) {
-        await clearTokens(req, res, next)
+        await clearTokens(req, res)
         throw createError.Unauthorized()
       }
 
       try {
-        const decodedToken = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET!) as { userId: number }
+        const decodedToken = jwt.verify(
+          refreshToken,
+          REFRESH_TOKEN_SECRET!
+        ) as { userId: number }
         const { userId } = decodedToken
         const user = await userDal.getById(userId)
         if (!user) {
-          await clearTokens(req, res, next)
+          await clearTokens(req, res)
           throw createError('Invalid credentials')
         }
 
-        const accessToken = generateJWT(user.id, ACCESS_TOKEN_SECRET!, ACCESS_TOKEN_LIFE!)
+        const accessToken = generateJWT(
+          user.id,
+          ACCESS_TOKEN_SECRET!,
+          ACCESS_TOKEN_LIFE!
+        )
         return res.status(200).json({
           user,
           accessToken,

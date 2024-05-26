@@ -6,7 +6,11 @@ import * as intervalDal from '../db/dal/interval'
 import * as userDal from '../db/dal/user'
 
 export class EventController {
-  public static async getUserEvents(req: Request, res: Response, next: NextFunction) {
+  public static async getUserEvents(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     const result = validationResult(req)
     if (!result.isEmpty()) {
       return res.status(400).send({ errors: result.array() })
@@ -28,7 +32,11 @@ export class EventController {
     }
   }
 
-  public static async createEvent(req: Request, res: Response, next: NextFunction) {
+  public static async createEvent(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     const result = validationResult(req)
     if (!result.isEmpty()) {
       return res.status(400).send({ errors: result.array() })
@@ -46,7 +54,9 @@ export class EventController {
       const event = await eventDal.createEvent(user, name, description, image)
 
       for (const interval of intervals) {
-        console.log(`[EventController::createEvent] interval: ${interval.start} ${interval.end}`)
+        console.log(
+          `[EventController::createEvent] interval: ${interval.start} ${interval.end}`
+        )
 
         const createdInterval = await intervalDal.create(interval)
         await event.attachInterval(createdInterval)
@@ -60,7 +70,11 @@ export class EventController {
     }
   }
 
-  public static async sendInvite(req: Request, res: Response, next: NextFunction) {
+  public static async sendInvite(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     const result = validationResult(req)
     if (!result.isEmpty()) {
       return res.status(400).send({ errors: result.array() })
